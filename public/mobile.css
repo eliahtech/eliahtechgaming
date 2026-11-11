@@ -1,0 +1,84 @@
+/* Mobile-first refinements shared by server-rendered pages (templates.js) and the admin/account shell (admin.html).
+   Loaded LAST so it can override gaming.css, styles.css, workspace.css and slides.css. Plain CSS only (CSP-safe). */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overflow-x:hidden;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+img,video,svg,canvas{max-width:100%}
+a,button,summary,[role=button],input,select,textarea,label{touch-action:manipulation;-webkit-tap-highlight-color:rgba(23,105,232,.18)}
+.site-header,.nav-wrap{padding-top:env(safe-area-inset-top,0px)}
+footer,.footer{padding-bottom:calc(1.4rem + env(safe-area-inset-bottom,0px))}
+.article-body iframe{width:100%;aspect-ratio:16/9;height:auto;border:0}
+.article-body code{overflow-wrap:anywhere}
+.table-responsive{-webkit-overflow-scrolling:touch}
+@media(hover:none){.post-card:hover{transform:none}}
+
+/* Tablet and below: comfortable navigation targets */
+@media(max-width:991.98px){
+  .navbar-toggler{min-width:44px;min-height:44px}
+  .navbar-nav .nav-link{display:flex;align-items:center;min-height:44px;padding:.6rem .5rem!important}
+  .navbar-collapse{max-height:calc(100dvh - 90px);overflow-y:auto}
+  .etg-brand-logo{width:88px;height:64px}
+  .ai-log{max-height:55dvh}
+}
+
+/* Phones */
+@media(max-width:767.98px){
+  /* 16px prevents iOS Safari from zooming into focused fields */
+  input,select,textarea,.form-control,.form-select{font-size:16px!important}
+  .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .btn-sm{min-height:40px}
+  .btn-link{min-height:44px}
+  .hero{padding:3rem 0 2.5rem}
+  .hero h1{font-size:clamp(2rem,9vw,2.6rem)!important;line-height:1.1}
+  .page-hero h1{font-size:clamp(1.9rem,8vw,2.4rem)}
+  .section{padding:2.5rem 0}
+  .container,.container-xl{padding-left:1rem;padding-right:1rem}
+  .article-body{font-size:1.02rem;line-height:1.7}
+  .article-body h2{font-size:1.45rem}
+  .article-body h3{font-size:1.2rem}
+  .reader-actions,.community-panel,.premium-panel{padding:1rem}
+  .post-card{border-radius:14px}
+  .article-cover{border-radius:12px}
+
+  /* Footer links: spaced for fingers */
+  footer a,.footer a{display:inline-block;padding:.4rem .2rem}
+  footer .btn-link{padding:.4rem .2rem}
+
+  /* Carousel: bigger touch areas without changing the visual size of the dots */
+  .etg-slide-dot{position:relative}
+  .etg-slide-dot::after{content:'';position:absolute;inset:-19px -3px}
+  .etg-slide-actions button{min-height:40px;min-width:40px}
+  .etg-carousel-controls{flex-wrap:wrap;row-gap:6px}
+
+  /* Toasts span the screen above the home indicator */
+  .toast-root{left:.75rem;right:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0px))}
+  .toast-card{min-width:0;max-width:none}
+
+  /* Dialogs */
+  .etg-browsing-dialog{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;padding:18px}
+  .etg-browsing-actions{flex-wrap:wrap}
+  .etg-browsing-actions button{min-height:44px;flex:1 1 140px}
+  .etg-promotion{width:min(460px,calc(100vw - 24px),calc(100dvh - 90px))}
+
+  /* Admin and account pages */
+  .admin-mobile-toggle{width:100%}
+  .admin-sidebar a,.admin-sidebar button{min-height:44px}
+  .admin-sidebar{max-height:60dvh}
+  .table-responsive table{min-width:560px}
+  .card-surface{padding-left:1rem;padding-right:1rem}
+  .editor-preview{max-height:50dvh;padding:14px}
+  .modal-dialog{margin:.5rem}
+}
+
+/* Very small phones */
+@media(max-width:359.98px){
+  .etg-brand-logo{width:72px;height:52px}
+  .etg-slide-content h2{font-size:1.55rem}
+  .etg-slide-count{display:none}
+}
+
+/* Short landscape screens: keep the nav and dialogs usable */
+@media(max-height:480px) and (orientation:landscape){
+  .navbar-collapse{max-height:calc(100dvh - 70px)}
+  .etg-carousel-track{min-height:360px}
+  .etg-browsing-dialog,.etg-promotion{max-height:calc(100dvh - 16px)}
+}

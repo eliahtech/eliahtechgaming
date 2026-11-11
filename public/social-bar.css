@@ -1,0 +1,13 @@
+/* Pinned social strip: always visible at the top of every page. */
+.social-bar{position:sticky;top:0;z-index:1040;background:#0a1530;border-bottom:1px solid rgba(255,255,255,.12);padding-top:env(safe-area-inset-top,0px);box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.social-bar-inner{max-width:1320px;margin:0 auto;padding:.3rem .9rem;display:flex;align-items:center;justify-content:center;gap:.85rem}
+.social-bar-label{color:rgba(255,255,255,.78);font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.social-bar-icons{display:flex;align-items:center;gap:.55rem}
+.social-icon{display:inline-flex;line-height:0;border-radius:50%;box-shadow:0 0 0 1px rgba(255,255,255,.35);transition:transform .15s ease,box-shadow .15s ease}
+.social-icon:hover,.social-icon:focus-visible{transform:translateY(-2px) scale(1.08);box-shadow:0 4px 12px rgba(0,0,0,.45);outline:none}
+.social-icon:focus-visible{box-shadow:0 0 0 3px #f1b839}
+.social-svg{display:block;width:30px;height:30px}
+.footer-socials .social-icon,.footer-icons .social-icon{margin-right:.1rem}
+.social-bar+.site-header,.social-bar+.nav-wrap{position:relative}
+@media (max-width:575px){.social-bar-label{display:none}.social-bar-inner{padding:.25rem .5rem}.social-svg{width:28px;height:28px}.social-bar-icons{gap:.7rem}}
+@media (prefers-reduced-motion:reduce){.social-icon{transition:none}}

@@ -1,0 +1,135 @@
+{
+  "results": [
+    {
+      "viewport": 1440,
+      "path": "/",
+      "title": "Play smarter. Solve problems. | Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 1440,
+      "path": "/posts/ppsspp-guide",
+      "title": "Make PPSSPP run smoothly on your Android phone | Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 1440,
+      "path": "/admin/overview",
+      "title": "Admin \u2014 Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 1440,
+      "path": "/admin/posts/new",
+      "title": "Admin \u2014 Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 1440,
+      "path": "/admin/ads-settings",
+      "title": "Admin \u2014 Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 1440,
+      "path": "/login",
+      "title": "Log in \u2014 Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 390,
+      "path": "/",
+      "title": "Play smarter. Solve problems. | Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 390,
+      "path": "/posts/ppsspp-guide",
+      "title": "Make PPSSPP run smoothly on your Android phone | Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 390,
+      "path": "/admin/overview",
+      "title": "Admin \u2014 Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 390,
+      "path": "/admin/posts/new",
+      "title": "Admin \u2014 Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 390,
+      "path": "/admin/ads-settings",
+      "title": "Admin \u2014 Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14,
+      "imagesLoaded": 1
+    },
+    {
+      "viewport": 390,
+      "path": "/login",
+      "title": "Log in \u2014 Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14,
+      "imagesLoaded": 1
+    }
+  ],
+  "errors": [],
+  "checks": {
+    "three_second_autoplay": {
+      "before": "0",
+      "after": "1"
+    },
+    "pause": true,
+    "last_to_first": true,
+    "transition_styles": [
+      "zoom",
+      "reveal",
+      "fade",
+      "pan",
+      "rise"
+    ],
+    "soft_navigation": true,
+    "reduced_motion": true,
+    "branding": true,
+    "favicon": true,
+    "manifest": true
+  },
+  "fixture": "Mocked APIs and content; production rendering/browser modules",
+  "created_at": "2026-10-25T13:02:18.175550+00:00"
+}

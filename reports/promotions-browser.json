@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "checks": {
+    "mobile_fit": true,
+    "close_button": true,
+    "escape": true,
+    "focus": true,
+    "daily_cap": true,
+    "non_repeating_rotation": {
+      "first": "premium",
+      "second": "guides"
+    },
+    "image_link_redirect": "/posts/ppsspp-guide",
+    "admin_controls": true,
+    "lightweight_skip": true
+  },
+  "fixture": "Production browser modules; mocked API/content. Backend membership, scheduling, page restrictions and validation covered by unit/API tests."
+}

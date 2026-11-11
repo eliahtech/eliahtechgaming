@@ -1,0 +1,131 @@
+{
+  "results": [
+    {
+      "viewport": 1440,
+      "path": "/games",
+      "title": "Game hubs | Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14
+    },
+    {
+      "viewport": 1440,
+      "path": "/games/ppsspp",
+      "title": "PPSSPP guides & support | Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14
+    },
+    {
+      "viewport": 1440,
+      "path": "/search?q=PPSSPP&platform=ppsspp&ram=2",
+      "title": "Search: PPSSPP | Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14
+    },
+    {
+      "viewport": 1440,
+      "path": "/post/ppsspp-guide",
+      "title": "Make PPSSPP run smoothly on your Android phone | Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14
+    },
+    {
+      "viewport": 1440,
+      "path": "/admin/quality",
+      "title": "Admin — Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14
+    },
+    {
+      "viewport": 1440,
+      "path": "/admin/games",
+      "title": "Admin — Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14
+    },
+    {
+      "viewport": 1440,
+      "path": "/admin/posts/new",
+      "title": "Admin — Eliahtech Gaming",
+      "width": 1440,
+      "scroll": 1440,
+      "slides": 14
+    },
+    {
+      "viewport": 390,
+      "path": "/games",
+      "title": "Game hubs | Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14
+    },
+    {
+      "viewport": 390,
+      "path": "/games/ppsspp",
+      "title": "PPSSPP guides & support | Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14
+    },
+    {
+      "viewport": 390,
+      "path": "/search?q=PPSSPP&platform=ppsspp&ram=2",
+      "title": "Search: PPSSPP | Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14
+    },
+    {
+      "viewport": 390,
+      "path": "/post/ppsspp-guide",
+      "title": "Make PPSSPP run smoothly on your Android phone | Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14
+    },
+    {
+      "viewport": 390,
+      "path": "/admin/quality",
+      "title": "Admin — Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14
+    },
+    {
+      "viewport": 390,
+      "path": "/admin/games",
+      "title": "Admin — Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14
+    },
+    {
+      "viewport": 390,
+      "path": "/admin/posts/new",
+      "title": "Admin — Eliahtech Gaming",
+      "width": 390,
+      "scroll": 390,
+      "slides": 14
+    }
+  ],
+  "errors": [],
+  "checks": {
+    "game_hubs": true,
+    "search_filters": true,
+    "compatibility": true,
+    "update_history": true,
+    "continue_learning": true,
+    "quality_dashboard": true,
+    "lightweight_persistence": true,
+    "no_slide_image_requests_after_reload": true,
+    "manual_lightweight_navigation": true,
+    "animations_preference": true,
+    "manual_link_check": true
+  },
+  "fixture": "Mocked API and metadata; production rendering and browser modules. No live Supabase or external URLs checked."
+}

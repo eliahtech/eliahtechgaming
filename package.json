@@ -1,0 +1,44 @@
+{
+  "name": "eliah-tech",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Eliahtech Gaming \u2014 Express, Bootstrap and Supabase",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "test": "node --test",
+    "lint": "node scripts/lint.mjs",
+    "build": "npm run vendor && npm run lint",
+    "pesapal:register-ipn": "node scripts/pesapal-register-ipn.mjs",
+    "vendor": "node scripts/vendor-assets.mjs",
+    "dev:api": "npm run dev",
+    "start:api": "npm start",
+    "build:vercel": "npm run build",
+    "security:secrets": "node scripts/secret-scan.mjs",
+    "verify:env": "node scripts/verify-env.mjs",
+    "verify:supabase": "node scripts/verify-supabase.mjs",
+    "verify:deployment": "node scripts/verify-deployment.mjs",
+    "report": "node scripts/build-report.mjs",
+    "test:sql": "node scripts/test-migrations.mjs"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "htmlparser2": "8.0.2",
+    "sanitize-html": "2.13.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11",
+    "supertest": "^7.0.0"
+  },
+  "overrides": {
+    "htmlparser2": "$htmlparser2"
+  }
+}

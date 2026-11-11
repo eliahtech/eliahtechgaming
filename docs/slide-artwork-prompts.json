@@ -1,0 +1,61 @@
+{
+  "generation_tool": "Built-in image generation",
+  "assets": [
+    {
+      "name": "football-1",
+      "prompt": "Fictional football players celebrating a goal, cinematic 16:9 blue/gold stadium background with quiet left-side space."
+    },
+    {
+      "name": "football-2",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. Fictional adult football forward in an unbranded gold and navy kit scoring a spectacular airborne volley on the RIGHT TWO THIRDS, two defenders chasing, football clearly visible, vivid green pitch and dramatic blue stadium lights, energetic sports-game promotional realism. LEFT THIRD intentionally spacious and quieter with deep navy atmosphere for overlay text, main subjects safely inside responsive crop zone. Eye-catching electric blue, navy, gold palette. No text, no logos, no watermark, no collage, no UI labels. Full-bleed high-quality landscape image."
+    },
+    {
+      "name": "psp-1",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. A pristine unbranded portable handheld gaming console with familiar PSP-like silhouette on the RIGHT TWO THIRDS on a dark premium gaming desk, its screen showing an original colorful rally racing scene, electric-blue rim lighting, tasteful gold accents, polished realistic product photography. LEFT THIRD intentionally spacious and quieter with deep navy atmosphere for overlay text, main subjects safely inside responsive crop zone. Eye-catching electric blue, navy, gold palette. No text, no logos, no watermark, no collage, no UI labels. Full-bleed high-quality landscape image."
+    },
+    {
+      "name": "psp-2",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. Close-up of adult hands holding an unbranded PSP-style portable gaming console on the RIGHT TWO THIRDS, screen showing an original vibrant football match, blue-lit cozy gaming room, tactile buttons and analog stick, photorealistic premium editorial gaming image. LEFT THIRD intentionally spacious and quieter with deep navy atmosphere for overlay text, main subjects safely inside responsive crop zone. Eye-catching electric blue, navy, gold palette. No text, no logos, no watermark, no collage, no UI labels. Full-bleed high-quality landscape image."
+    },
+    {
+      "name": "android-1",
+      "prompt": "Wide cinematic 16:9 website hero background artwork. A high-end unbranded Android-style smartphone in landscape orientation with a gamepad controller attached, on the RIGHT TWO THIRDS, screen displaying an original colorful futuristic street racing game at sunset, premium realistic product photography, blue light and gold reflections. LEFT THIRD spacious, subdued deep navy negative space for overlay text. Main subjects remain in responsive crop safe area. Coordinated electric-blue, navy and gold visual identity. No text, no logos, no watermark, no collage or written UI. Full-bleed polished landscape image."
+    },
+    {
+      "name": "android-2",
+      "prompt": "Wide cinematic 16:9 website hero background artwork. Adult gamer hands holding an unbranded Android-style smartphone landscape on the RIGHT TWO THIRDS, vivid original fantasy adventure game on screen with a heroic explorer and lush island, warm gold highlights and blue-lit room, polished believable photography. LEFT THIRD spacious, subdued deep navy negative space for overlay text. Main subjects remain in responsive crop safe area. Coordinated electric-blue, navy and gold visual identity. No text, no logos, no watermark, no collage or written UI. Full-bleed polished landscape image."
+    },
+    {
+      "name": "installation-1",
+      "prompt": "Wide cinematic 16:9 website hero background artwork. Carefully arranged smartphone, portable gaming console, memory card and USB-C cable on the RIGHT TWO THIRDS of a tidy navy desk, a laptop in the back with abstract simple folder symbols and a tasteful glowing checkmark, visual concept of game installation and setup, premium realistic still life. LEFT THIRD spacious, subdued deep navy negative space for overlay text. Main subjects remain in responsive crop safe area. Coordinated electric-blue, navy and gold visual identity. No text, no logos, no watermark, no collage or written UI. Full-bleed polished landscape image."
+    },
+    {
+      "name": "installation-2",
+      "prompt": "Wide cinematic 16:9 website hero background artwork. Overhead three-quarter view of adult hands connecting a smartphone and handheld gaming console by USB cable on the RIGHT TWO THIRDS, organized memory cards and storage accessories, a laptop displays a clean abstract progress ring without words, reassuring practical game setup scene, realistic premium photography. LEFT THIRD spacious, subdued deep navy negative space for overlay text. Main subjects remain in responsive crop safe area. Coordinated electric-blue, navy and gold visual identity. No text, no logos, no watermark, no collage or written UI. Full-bleed polished landscape image."
+    },
+    {
+      "name": "graphics-1",
+      "prompt": "Wide cinematic 16:9 website hero background artwork. A beautiful unbranded gaming monitor on the RIGHT TWO THIRDS shows an original football stadium scene with crisp detailed grass and colorful uniform textures, tasteful floating unlabelled texture tiles in foreground, graphics-upgrade concept, cinematic blue and gold studio lighting, premium realistic gaming render. LEFT THIRD spacious, subdued deep navy negative space for overlay text. Main subjects remain in responsive crop safe area. Coordinated electric-blue, navy and gold visual identity. No text, no logos, no watermark, no collage or written UI. Full-bleed polished landscape image."
+    },
+    {
+      "name": "graphics-2",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. An original futuristic racing car on the RIGHT TWO THIRDS transitioning elegantly from simple blue wireframe geometry at its rear into richly detailed photorealistic gold-and-blue surfaces at its front, dramatic blue-lit virtual studio, texture improvement and modding concept, beautiful coherent full scene rather than divided comparison panels. LEFT THIRD remains spacious and quieter deep navy for overlay copy, important subjects in responsive crop safe area. Coordinated electric-blue, navy and gold accents. No words, no logos, no watermark, no collage. Full-bleed striking high-quality landscape artwork."
+    },
+    {
+      "name": "tech-1",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. An organized high-performance gaming laptop and a smartphone on the RIGHT TWO THIRDS, detailed glowing blue circuit traces and tasteful abstract performance bars floating near the hardware, a controller on the desk, premium realistic tech photography, gaming optimization and troubleshooting concept. LEFT THIRD remains spacious and quieter deep navy for overlay copy, important subjects in responsive crop safe area. Coordinated electric-blue, navy and gold accents. No words, no logos, no watermark, no collage. Full-bleed striking high-quality landscape artwork."
+    },
+    {
+      "name": "tech-2",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. Adult hands carefully adjusting a controller and laptop on the RIGHT TWO THIRDS of an elegant gaming workstation, visible cooling fan and neatly arranged toolkit, luminous unlabelled diagnostics shapes on the screen, practical gaming troubleshooting, premium believable editorial photography. LEFT THIRD remains spacious and quieter deep navy for overlay copy, important subjects in responsive crop safe area. Coordinated electric-blue, navy and gold accents. No words, no logos, no watermark, no collage. Full-bleed striking high-quality landscape artwork."
+    },
+    {
+      "name": "ai-1",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. A sophisticated friendly abstract AI assistant represented by a luminous blue neural orb hovering above an unbranded gaming controller on the RIGHT TWO THIRDS, elegant connected nodes and a few floating original gaming-art thumbnails, polished cinematic photorealistic 3D rendering, creative intelligence for gaming creators. LEFT THIRD remains spacious and quieter deep navy for overlay copy, important subjects in responsive crop safe area. Coordinated electric-blue, navy and gold accents. No words, no logos, no watermark, no collage. Full-bleed striking high-quality landscape artwork."
+    },
+    {
+      "name": "ai-2",
+      "prompt": "Wide cinematic 16:9 website hero BACKGROUND artwork. A gaming creator desk on the RIGHT TWO THIRDS, monitor showing an original football poster artwork with fictional players and abstract creative-tool panels without text, tasteful glowing cyan AI spark and gold neural pathways flowing toward the artwork, unbranded controller and headphones, premium photorealistic cinematic creator studio. LEFT THIRD remains spacious and quieter deep navy for overlay copy, important subjects in responsive crop safe area. Coordinated electric-blue, navy and gold accents. No words, no logos, no watermark, no collage. Full-bleed striking high-quality landscape artwork."
+    }
+  ]
+}

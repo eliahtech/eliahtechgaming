@@ -1,0 +1,29 @@
+{
+  "routes": [
+    { "path": "/", "title": "Home" },
+    { "path": "/posts", "title": "All guides" },
+    { "path": "/posts/:slug", "title": "Article" },
+    { "path": "/categories", "title": "Categories" },
+    { "path": "/categories/:slug", "title": "Category" },
+    { "path": "/services", "title": "Services" },
+    { "path": "/search", "title": "Search" },
+    { "path": "/ai", "title": "AI assistant" },
+    { "path": "/premium", "title": "Premium" },
+    { "path": "/login", "title": "Login" },
+    { "path": "/register", "title": "Register" },
+    { "path": "/forgot-password", "title": "Forgot password" },
+    { "path": "/reset-password", "title": "Reset password" },
+    { "path": "/profile", "title": "Profile" },
+    { "path": "/newsletter", "title": "Newsletter signup" },
+    { "path": "/newsletter/:action", "title": "Newsletter action" },
+    { "path": "/payment/:result", "title": "Payment status" },
+    { "path": "/admin", "title": "Admin" },
+    { "path": "/admin/:path*", "title": "Admin section" },
+    { "path": "/about", "title": "About" },
+    { "path": "/contact", "title": "Contact" },
+    { "path": "/privacy", "title": "Privacy" },
+    { "path": "/terms", "title": "Terms" },
+    { "path": "/disclaimer", "title": "Disclaimer" },
+    { "path": "/dmca", "title": "Copyright" }
+  ]
+}

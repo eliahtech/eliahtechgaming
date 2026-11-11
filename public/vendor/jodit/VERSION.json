@@ -1,0 +1,7 @@
+{
+  "version": "4.18.10",
+  "files": {
+    "jodit.min.js": "sha384-yxpZSwWIXx73U2FzoCUOn6Zsz9vRdGu3MqqrHTf7G3toNPzGx6T3BcCK8zRTJllz",
+    "jodit.min.css": "sha384-55Or3n5ARgjmyl/YVgnSAWKovsGS8Bt6kfb3wjSKwflzZ2tfPLZ5CXdQMsk8epGU"
+  }
+}

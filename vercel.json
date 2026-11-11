@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "framework": null,
+  "installCommand": "rm -f package-lock.json && npm install --no-package-lock && (npm ls htmlparser2 sanitize-html || true)",
+  "buildCommand": "npm run build:vercel",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60,
+      "includeFiles": "{src/**,public/**,node_modules/htmlparser2/**,node_modules/sanitize-html/**}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)\\.(webp|png|jpg|jpeg|ico|svg)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/v1/jobs/run",
+      "schedule": "30 3 * * *"
+    }
+  ]
+}
