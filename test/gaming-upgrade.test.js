@@ -4,7 +4,7 @@ import express from 'express';
 import request from 'supertest';
 import path from 'node:path';
 import { createWebRouter } from '../src/web/routes.js';
-import { adEligible, activeAds, adMarkup } from '../src/web/ads.js';
+import { adEligible, activeAds, adMarkup, adDomains } from '../src/web/ads.js';
 import { browserSession } from '../src/session/express.js';
 import { sessionCookies, csrfProblem } from '../src/session/cookies.js';
 import { registerGoogle } from '../src/session/google.js';
@@ -92,4 +92,15 @@ test('an expired access cookie with a valid refresh cookie renews before premium
 test('homepage rendering honors dashboard section visibility and editable hero copy',async()=>{
  const response=await request(site({homeSettings:{hero_title:'MY_GAMING_TITLE',hero_description:'MY_GAMING_DESCRIPTION',latest_post_count:3,sections:[{key:'ai',title:'AI_SECTION',enabled:true},{key:'latest',enabled:false}]}})).get('/');
  assert.equal(response.status,200);assert.match(response.text,/MY_GAMING_TITLE/);assert.match(response.text,/MY_GAMING_DESCRIPTION/);assert.match(response.text,/AI_SECTION/);assert.doesNotMatch(response.text,/class="card post-card/);
+});
+test('built-in ad origin works without AD_ALLOWED_ORIGINS, other scripts are still stripped, and env origins add to it',()=>{
+ const saved=process.env.AD_ALLOWED_ORIGINS;
+ try{
+  delete process.env.AD_ALLOWED_ORIGINS;
+  const tag='<script>atOptions={key:\'k\'};</script><script src=\"https://bauval.org/22/k\"></script><script src=\"https://evil.example/x.js\"></script>';
+  const out=adMarkup({placement:'sidebar',code:tag},'abc');
+  assert.match(out,/https:\/\/bauval\.org\/22\/k/);assert.match(out,/atOptions/);assert.doesNotMatch(out,/evil\.example/);
+  process.env.AD_ALLOWED_ORIGINS='https://ads.example, https://bauval.org';
+  assert.deepEqual(adDomains(),['https://bauval.org','https://ads.example']);
+ }finally{if(saved===undefined)delete process.env.AD_ALLOWED_ORIGINS;else process.env.AD_ALLOWED_ORIGINS=saved;}
 });

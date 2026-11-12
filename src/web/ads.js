@@ -2,7 +2,10 @@ import sanitizeHtml from 'sanitize-html';
 import { cspDirectives } from '../csp.js';
 import { siteScriptOrigins } from './site-scripts.js';
 
-export const adDomains = () => String(process.env.AD_ALLOWED_ORIGINS || '').split(',').map(v => v.trim()).filter(v => { try { const u = new URL(v); return u.protocol === 'https:' && u.origin === v; } catch { return false; } });
+// Ad networks the site owner has approved in code, so banner ads pasted into the admin Ad Placement tab work without any
+// environment variable. AD_ALLOWED_ORIGINS can still add more exact https origins.
+export const BUILTIN_AD_ORIGINS = ['https://bauval.org'];
+export const adDomains = () => [...new Set([...BUILTIN_AD_ORIGINS, ...String(process.env.AD_ALLOWED_ORIGINS || '').split(',').map(v => v.trim()).filter(v => { try { const u = new URL(v); return u.protocol === 'https:' && u.origin === v; } catch { return false; } })])];
 export function adEligible({ isPost, user, verified = true }) { return Boolean(isPost && verified && !user?.access?.isPremium); }
 export function activeAds(rows, { now = Date.now() } = {}) {
   return rows.filter(a => a.enabled && (!a.starts_at || Date.parse(a.starts_at) <= now) && (!a.ends_at || Date.parse(a.ends_at) > now));
