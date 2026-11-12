@@ -6,7 +6,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { parseHtmlPost } from '../src/admin/html-post.js';
 import { slugify } from '../src/admin/fields.js';
-import { scopeCss, STYLE_BLOCK, POST_SCOPE } from '../src/css-scope.js';
+import { scopeCss, STYLE_BLOCK } from '../src/css-scope.js';
 
 const input = process.argv[2]; const outDir = process.argv[3] || 'content/blogger-import';
 if (!input) { console.error('Usage: node scripts/blogger-takeout-import.mjs <feed.atom> [outDir]'); process.exit(1); }

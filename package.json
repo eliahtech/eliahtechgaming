@@ -23,7 +23,7 @@
     "test:sql": "node scripts/test-migrations.mjs"
   },
   "engines": {
-    "node": "22.x"
+    "node": ">=26 <27"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
