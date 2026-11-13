@@ -4,7 +4,7 @@ import express from 'express';
 import request from 'supertest';
 import path from 'node:path';
 import { createWebRouter } from '../src/web/routes.js';
-import { adEligible, activeAds, adMarkup, adDomains } from '../src/web/ads.js';
+import { adEligible, activeAds, adMarkup, adDomains, adCsp, AD_INLINE_HASHES } from '../src/web/ads.js';
 import { browserSession } from '../src/session/express.js';
 import { sessionCookies, csrfProblem } from '../src/session/cookies.js';
 import { registerGoogle } from '../src/session/google.js';
@@ -103,4 +103,12 @@ test('built-in ad origin works without AD_ALLOWED_ORIGINS, other scripts are sti
   process.env.AD_ALLOWED_ORIGINS='https://ads.example, https://bauval.org';
   assert.deepEqual(adDomains(),['https://bauval.org','https://ads.example']);
  }finally{if(saved===undefined)delete process.env.AD_ALLOWED_ORIGINS;else process.env.AD_ALLOWED_ORIGINS=saved;}
+});
+test('ad page CSP lets the ad networks finish loading: extra connect origins, banner inline-script hashes, and still a nonce',()=>{
+ const csp=adCsp('abc123');
+ const get=(name)=>csp.split('; ').find((d)=>d.startsWith(name+' '))||'';
+ assert.match(get('connect-src'),/https:\/\/araplhn\.org/);assert.match(get('connect-src'),/https:\/\/6opo\.com/);
+ assert.match(get('script-src'),/'nonce-abc123'/);assert.match(get('script-src'),/https:\/\/bauval\.org/);
+ for(const h of AD_INLINE_HASHES){assert.match(h,/^sha256-[A-Za-z0-9+\/]{43}=$/);assert.ok(get('script-src').includes(`'${h}'`));}
+ assert.doesNotMatch(get('script-src'),/unsafe-inline|unsafe-eval/);assert.match(get('object-src'),/'none'/);assert.match(get('frame-ancestors'),/'none'/);
 });

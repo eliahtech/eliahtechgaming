@@ -24,8 +24,20 @@ export function adMarkup(ad, nonce) {
   if (ad.placement === 'auto') return code;
   return `<aside class="advertisement ad-${ad.device || 'both'}" aria-label="Advertisement"><small>Advertisement</small>${code}</aside>`;
 }
+// Addresses the site-wide ad scripts (Monetag, Adsterra pop/social bar) contact after they load. Taken from the browser's
+// Content-Security-Policy console reports; add a new one here if the Console shows another `Refused to connect to ...`.
+export const AD_EXTRA_ORIGINS = ['https://araplhn.org', 'https://6opo.com'];
+// SHA-256 hashes of the small inline scripts that Adsterra's banner script (bauval.org/22/...) writes into the page. Browsers
+// refuse inline scripts without a nonce or hash, so each one is allowed by its exact content. A banner with a new key or size
+// has new hashes: the Console shows them in `Refused to execute inline script ... 'sha256-...'` lines.
+export const AD_INLINE_HASHES = [
+  'sha256-Jon5QbhLFLG3UX0GXPyUMhtKBQVrMzPFym/mpG21T74=', 'sha256-mekHMuyuDS1U30f/aLpt0ygi8Mlfj7U3e4JrD5FQ8Fw=',
+  'sha256-oZK9qdINNqM21fJalgAtQWQOHcVTDhRXinP81GWkjcQ=', 'sha256-Y5xunX9cO4fYw0nd6jNMe0qUygT7hq6lOmbIpQ27NzU=',
+];
 export function adCsp(nonce) {
   const origins = [...new Set([...adDomains(), ...siteScriptOrigins()])];
-  const directives = { ...cspDirectives, scriptSrc: [...cspDirectives.scriptSrc, ...origins, `'nonce-${nonce}'`], frameSrc: [...cspDirectives.frameSrc, ...origins], connectSrc: [...cspDirectives.connectSrc, ...origins] };
+  const extra = [...origins, ...AD_EXTRA_ORIGINS];
+  const hashes = AD_INLINE_HASHES.map((h) => `'${h}'`);
+  const directives = { ...cspDirectives, scriptSrc: [...cspDirectives.scriptSrc, ...extra, `'nonce-${nonce}'`, ...hashes], frameSrc: [...cspDirectives.frameSrc, ...origins], connectSrc: [...cspDirectives.connectSrc, ...extra] };
   return Object.entries(directives).map(([k,v]) => `${k.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())} ${v.join(' ')}`).join('; ');
 }
