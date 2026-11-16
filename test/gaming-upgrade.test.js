@@ -107,8 +107,16 @@ test('built-in ad origin works without AD_ALLOWED_ORIGINS, other scripts are sti
 test('ad page CSP lets the ad networks finish loading: extra connect origins, banner inline-script hashes, and still a nonce',()=>{
  const csp=adCsp('abc123');
  const get=(name)=>csp.split('; ').find((d)=>d.startsWith(name+' '))||'';
- assert.match(get('connect-src'),/https:\/\/araplhn\.org/);assert.match(get('connect-src'),/https:\/\/6opo\.com/);
+ assert.match(get('connect-src'),/https:\/\/araplhn\.org/);assert.match(get('connect-src'),/https:\/\/6opo\.com/);assert.match(get('connect-src'),/https:\/\/cdn\.show-sb\.com/);
+ for(const o of ['auqot.com','ekhay.com','b3mny.com'])assert.match(get('script-src'),new RegExp('https://'+o.replace('.','\\.')));
+ assert.doesNotMatch(get('script-src'),/show-sb/);
  assert.match(get('script-src'),/'nonce-abc123'/);assert.match(get('script-src'),/https:\/\/bauval\.org/);
  for(const h of AD_INLINE_HASHES){assert.match(h,/^sha256-[A-Za-z0-9+\/]{43}=$/);assert.ok(get('script-src').includes(`'${h}'`));}
  assert.doesNotMatch(get('script-src'),/unsafe-inline|unsafe-eval/);assert.match(get('object-src'),/'none'/);assert.match(get('frame-ancestors'),/'none'/);
+});
+test('the Adsterra site script is deferred so it can reach document.body; the Monetag tag stays async',async()=>{
+ const { siteScriptTags } = await import('../src/web/site-scripts.js');
+ const tags=siteScriptTags('N').split('</script>');
+ const abs=tags.find((t)=>t.includes('abscloud.org'));const monetag=tags.find((t)=>t.includes('quge5.com'));
+ assert.match(abs,/ defer /);assert.doesNotMatch(abs,/ async/);assert.match(monetag,/ async /);assert.doesNotMatch(monetag,/ defer/);
 });

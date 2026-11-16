@@ -26,18 +26,21 @@ export function adMarkup(ad, nonce) {
 }
 // Addresses the site-wide ad scripts (Monetag, Adsterra pop/social bar) contact after they load. Taken from the browser's
 // Content-Security-Policy console reports; add a new one here if the Console shows another `Refused to connect to ...`.
-export const AD_EXTRA_ORIGINS = ['https://araplhn.org', 'https://6opo.com'];
+export const AD_EXTRA_ORIGINS = ['https://araplhn.org', 'https://6opo.com', 'https://auqot.com', 'https://ekhay.com', 'https://b3mny.com'];
+// Addresses that only need to be contacted (fetch/XHR), not run as scripts.
+export const AD_EXTRA_CONNECT_ORIGINS = ['https://cdn.show-sb.com'];
 // SHA-256 hashes of the small inline scripts that Adsterra's banner script (bauval.org/22/...) writes into the page. Browsers
 // refuse inline scripts without a nonce or hash, so each one is allowed by its exact content. A banner with a new key or size
 // has new hashes: the Console shows them in `Refused to execute inline script ... 'sha256-...'` lines.
 export const AD_INLINE_HASHES = [
   'sha256-Jon5QbhLFLG3UX0GXPyUMhtKBQVrMzPFym/mpG21T74=', 'sha256-mekHMuyuDS1U30f/aLpt0ygi8Mlfj7U3e4JrD5FQ8Fw=',
   'sha256-oZK9qdINNqM21fJalgAtQWQOHcVTDhRXinP81GWkjcQ=', 'sha256-Y5xunX9cO4fYw0nd6jNMe0qUygT7hq6lOmbIpQ27NzU=',
+  'sha256-6ycNsCr50F5SO0iwXdcss6V31KxCDqRC6YK/3AAfM6Q=', 'sha256-6OGxGlTH08MBqnPNy3SIMRc5+HPP28z2P9V6RPym+Lg=',
 ];
 export function adCsp(nonce) {
   const origins = [...new Set([...adDomains(), ...siteScriptOrigins()])];
   const extra = [...origins, ...AD_EXTRA_ORIGINS];
   const hashes = AD_INLINE_HASHES.map((h) => `'${h}'`);
-  const directives = { ...cspDirectives, scriptSrc: [...cspDirectives.scriptSrc, ...extra, `'nonce-${nonce}'`, ...hashes], frameSrc: [...cspDirectives.frameSrc, ...origins], connectSrc: [...cspDirectives.connectSrc, ...extra] };
+  const directives = { ...cspDirectives, scriptSrc: [...cspDirectives.scriptSrc, ...extra, `'nonce-${nonce}'`, ...hashes], frameSrc: [...cspDirectives.frameSrc, ...origins], connectSrc: [...cspDirectives.connectSrc, ...extra, ...AD_EXTRA_CONNECT_ORIGINS] };
   return Object.entries(directives).map(([k,v]) => `${k.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())} ${v.join(' ')}`).join('; ');
 }
