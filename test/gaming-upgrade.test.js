@@ -4,7 +4,7 @@ import express from 'express';
 import request from 'supertest';
 import path from 'node:path';
 import { createWebRouter } from '../src/web/routes.js';
-import { adEligible, activeAds, adMarkup, adDomains, adCsp, AD_INLINE_HASHES } from '../src/web/ads.js';
+import { adEligible, activeAds, adMarkup, adDomains, adCsp } from '../src/web/ads.js';
 import { browserSession } from '../src/session/express.js';
 import { sessionCookies, csrfProblem } from '../src/session/cookies.js';
 import { registerGoogle } from '../src/session/google.js';
@@ -28,7 +28,7 @@ test('article HTML contains real cover, body, linked guide, metadata and canonic
  process.env.AD_ALLOWED_ORIGINS='https://ads.example';
  const res=await request(site()).get('/posts/ppsspp-guide');assert.equal(res.status,200);
  for(const text of ['BODY_SENTINEL','GUIDE_SENTINEL','og:image','https://cdn.example/cover.jpg','BlogPosting','https://gaming.example/posts/ppsspp-guide','wa.me','t.me/share'])assert.ok(res.text.includes(text),text);
- assert.match(res.headers['cache-control'],/private, no-cache/);assert.match(res.text,/AD_SENTINEL/);assert.match(res.headers['content-security-policy'],/nonce-/);
+ assert.match(res.headers['cache-control'],/private, no-cache/);assert.match(res.text,/AD_SENTINEL/);assert.match(res.headers['content-security-policy'],/script-src[^;]*'unsafe-inline'/);
 });
 test('active Premium users get article content and no manual or auto-ad loader',async()=>{
  const res=await request(site({premium:true})).get('/posts/ppsspp-guide');assert.equal(res.status,200);assert.match(res.text,/BODY_SENTINEL/);assert.doesNotMatch(res.text,/AD_SENTINEL|ads\.example\/loader/);
@@ -104,15 +104,20 @@ test('built-in ad origin works without AD_ALLOWED_ORIGINS, other scripts are sti
   assert.deepEqual(adDomains(),['https://bauval.org','https://ads.example']);
  }finally{if(saved===undefined)delete process.env.AD_ALLOWED_ORIGINS;else process.env.AD_ALLOWED_ORIGINS=saved;}
 });
-test('ad page CSP lets the ad networks finish loading: extra connect origins, banner inline-script hashes, and still a nonce',()=>{
- const csp=adCsp('abc123');
- const get=(name)=>csp.split('; ').find((d)=>d.startsWith(name+' '))||'';
- assert.match(get('connect-src'),/https:\/\/araplhn\.org/);assert.match(get('connect-src'),/https:\/\/6opo\.com/);assert.match(get('connect-src'),/https:\/\/cdn\.show-sb\.com/);
- for(const o of ['auqot.com','ekhay.com','b3mny.com'])assert.match(get('script-src'),new RegExp('https://'+o.replace('.','\\.')));
- assert.doesNotMatch(get('script-src'),/show-sb/);
- assert.match(get('script-src'),/'nonce-abc123'/);assert.match(get('script-src'),/https:\/\/bauval\.org/);
- for(const h of AD_INLINE_HASHES){assert.match(h,/^sha256-[A-Za-z0-9+\/]{43}=$/);assert.ok(get('script-src').includes(`'${h}'`));}
- assert.doesNotMatch(get('script-src'),/unsafe-inline|unsafe-eval/);assert.match(get('object-src'),/'none'/);assert.match(get('frame-ancestors'),/'none'/);
+test('article pages that show ads get the looser ad policy; every other page and visitor keeps the strict one',async()=>{
+ const get=(csp,name)=>csp.split('; ').find((d)=>d.startsWith(name+' '))||'';
+ const loose=adCsp('abc123',true);
+ assert.match(get(loose,'script-src'),/'unsafe-inline'/);assert.match(get(loose,'script-src'),/ https:(?: |$)/);assert.doesNotMatch(get(loose,'script-src'),/nonce-|unsafe-eval/);
+ for(const d of ['connect-src','frame-src','style-src','font-src'])assert.match(get(loose,d),/ https:(?: |$)/,d);
+ assert.match(get(loose,'object-src'),/'none'/);assert.match(get(loose,'frame-ancestors'),/'none'/);assert.match(get(loose,'base-uri'),/'self'/);assert.match(get(loose,'form-action'),/'self'/);assert.match(get(loose,'default-src'),/'self'/);
+ const strict=adCsp('abc123');
+ assert.match(get(strict,'script-src'),/'nonce-abc123'/);assert.doesNotMatch(get(strict,'script-src'),/unsafe-inline| https:(?: |$)/);assert.doesNotMatch(get(strict,'connect-src'),/ https:(?: |$)/);
+ const csp=async(app,url)=>(await request(app).get(url)).headers['content-security-policy'];
+ assert.match(get(await csp(site(),'/posts/ppsspp-guide'),'script-src'),/'unsafe-inline'/);
+ assert.doesNotMatch(get(await csp(site({premium:true}),'/posts/ppsspp-guide'),'script-src'),/unsafe-inline/);
+ assert.doesNotMatch(get(await csp(site({locked:true}),'/posts/ppsspp-guide'),'script-src'),/unsafe-inline/);
+ assert.doesNotMatch(get(await csp(site(),'/'),'script-src'),/unsafe-inline/);
+ assert.doesNotMatch(get(await csp(site(),'/posts'),'script-src'),/unsafe-inline/);
 });
 test('the Adsterra site script is deferred so it can reach document.body; the Monetag tag stays async',async()=>{
  const { siteScriptTags } = await import('../src/web/site-scripts.js');

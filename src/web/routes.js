@@ -25,7 +25,7 @@ export function createWebRouter({ db, repo, auth, optionalAuth, requireAdmin, ap
   }
   const send = async (res, options) => {
     const nonce = options.nonce || randomBytes(18).toString('base64');
-    res.set('Content-Security-Policy', adCsp(nonce));
+    res.set('Content-Security-Policy', adCsp(nonce, options.siteScripts === true));
     const cookie = res.req?.headers?.cookie || '';
     // HTML varies with the visitor's cookies, so shared caches and the CDN must never keep it. Signed-in pages are not stored at all;
     // anonymous pages may be kept by the browser but are always revalidated, which keeps back/forward navigation instant.
