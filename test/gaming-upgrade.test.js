@@ -107,14 +107,14 @@ test('built-in ad origin works without AD_ALLOWED_ORIGINS, other scripts are sti
 test('article pages that show ads get the looser ad policy; every other page and visitor keeps the strict one',async()=>{
  const get=(csp,name)=>csp.split('; ').find((d)=>d.startsWith(name+' '))||'';
  const loose=adCsp('abc123',true);
- assert.match(get(loose,'script-src'),/'unsafe-inline'/);assert.match(get(loose,'script-src'),/ https:(?: |$)/);assert.doesNotMatch(get(loose,'script-src'),/nonce-|unsafe-eval/);
+ assert.match(get(loose,'script-src'),/'unsafe-inline'/);assert.match(get(loose,'script-src'),/'unsafe-eval'/);assert.match(get(loose,'script-src'),/ https:(?: |$)/);assert.doesNotMatch(get(loose,'script-src'),/nonce-/);
  for(const d of ['connect-src','frame-src','style-src','font-src'])assert.match(get(loose,d),/ https:(?: |$)/,d);
  assert.match(get(loose,'object-src'),/'none'/);assert.match(get(loose,'frame-ancestors'),/'none'/);assert.match(get(loose,'base-uri'),/'self'/);assert.match(get(loose,'form-action'),/'self'/);assert.match(get(loose,'default-src'),/'self'/);
  const strict=adCsp('abc123');
- assert.match(get(strict,'script-src'),/'nonce-abc123'/);assert.doesNotMatch(get(strict,'script-src'),/unsafe-inline| https:(?: |$)/);assert.doesNotMatch(get(strict,'connect-src'),/ https:(?: |$)/);
+ assert.match(get(strict,'script-src'),/'nonce-abc123'/);assert.doesNotMatch(get(strict,'script-src'),/unsafe-inline|unsafe-eval| https:(?: |$)/);assert.doesNotMatch(get(strict,'connect-src'),/ https:(?: |$)/);
  const csp=async(app,url)=>(await request(app).get(url)).headers['content-security-policy'];
  assert.match(get(await csp(site(),'/posts/ppsspp-guide'),'script-src'),/'unsafe-inline'/);
- assert.doesNotMatch(get(await csp(site({premium:true}),'/posts/ppsspp-guide'),'script-src'),/unsafe-inline/);
+ assert.doesNotMatch(get(await csp(site({premium:true}),'/posts/ppsspp-guide'),'script-src'),/unsafe-inline|unsafe-eval/);
  assert.doesNotMatch(get(await csp(site({locked:true}),'/posts/ppsspp-guide'),'script-src'),/unsafe-inline/);
  assert.doesNotMatch(get(await csp(site(),'/'),'script-src'),/unsafe-inline/);
  assert.doesNotMatch(get(await csp(site(),'/posts'),'script-src'),/unsafe-inline/);

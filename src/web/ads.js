@@ -28,12 +28,12 @@ export function adMarkup(ad, nonce) {
 // - Ordinary pages (home, listings, login, premium, account...) keep the strict policy: only the approved ad origins and a nonce.
 // - Article pages that show ads to this visitor (`relaxed`) get a looser policy. Adsterra and Monetag rotate domains and write
 //   inline scripts that change on every load, so a fixed allow-list can never keep up. Inline scripts and any https source are
-//   allowed there. There is deliberately NO nonce in this policy: with a nonce present, browsers ignore 'unsafe-inline'.
+//   allowed there, and so is eval: Adsterra's banner script evaluates a string as code. There is deliberately NO nonce in this policy: with a nonce present, browsers ignore 'unsafe-inline'.
 //   Premium members, trial users, admins, locked posts and posts with ads switched off never get this policy.
 export function adCsp(nonce, relaxed = false) {
   const origins = [...new Set([...adDomains(), ...siteScriptOrigins()])];
   const directives = relaxed
-    ? { ...cspDirectives, scriptSrc: ["'self'", "'unsafe-inline'", 'https:'], styleSrc: [...cspDirectives.styleSrc, 'https:'], fontSrc: [...cspDirectives.fontSrc, 'https:'], frameSrc: [...cspDirectives.frameSrc, 'https:'], connectSrc: [...cspDirectives.connectSrc, 'https:'] }
+    ? { ...cspDirectives, scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https:'], styleSrc: [...cspDirectives.styleSrc, 'https:'], fontSrc: [...cspDirectives.fontSrc, 'https:'], frameSrc: [...cspDirectives.frameSrc, 'https:'], connectSrc: [...cspDirectives.connectSrc, 'https:'] }
     : { ...cspDirectives, scriptSrc: [...cspDirectives.scriptSrc, ...origins, `'nonce-${nonce}'`], frameSrc: [...cspDirectives.frameSrc, ...origins], connectSrc: [...cspDirectives.connectSrc, ...origins] };
   return Object.entries(directives).map(([k,v]) => `${k.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())} ${v.join(' ')}`).join('; ');
 }
