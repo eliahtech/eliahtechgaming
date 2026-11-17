@@ -15,4 +15,4 @@ export const cspDirectives = {
 };
 
 const kebab = (name) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
-export const cspHeaderValue = () => Object.entries(cspDirectives).map(([name, values]) => `${kebab(name)} ${values.join(' ')}`).join('; ');
+export const cspHeaderValue = (directives = cspDirectives) => Object.entries(directives).map(([name, values]) => `${kebab(name)} ${values.join(' ')}`).join('; ');

@@ -307,7 +307,9 @@ registerVoice(app, { requireAuth, limit });
 registerAiTasks(app, { db, service: ai.service, requireAuth, limit });
 registerGoogle(app, { appUrl });
 registerCommunityRoutes(app, { db, requireAuth, requireAdmin, optionalAuth, limit, appUrl });
-registerWebRoutes(app, { db, repo, auth, optionalAuth, requireAdmin, appUrl, publicDir, siteVerification: { google: process.env.GOOGLE_SITE_VERIFICATION, bing: process.env.BING_SITE_VERIFICATION } });
+// Google Search Console HTML-tag token for this site (public, it appears in the page source). GOOGLE_SITE_VERIFICATION overrides it.
+const GOOGLE_SITE_VERIFICATION_DEFAULT = 'WWVUGo9gjYbu6K2m_OEy0vh2A1uAzq7ohQxV7067Oh8';
+registerWebRoutes(app, { db, repo, auth, optionalAuth, requireAdmin, appUrl, publicDir, siteVerification: { google: process.env.GOOGLE_SITE_VERIFICATION || GOOGLE_SITE_VERIFICATION_DEFAULT, bing: process.env.BING_SITE_VERIFICATION } });
 
 app.use('/api', (_req, res) => fail(res, 'NOT_FOUND', 'Endpoint not found', 404));
 

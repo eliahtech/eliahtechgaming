@@ -8,6 +8,8 @@ import { sanitizeContent } from '../sanitize.js';
 import { pages } from '../../public/content.js';
 import { escape, layout, emptyState, skeletonPanel, cards, share, socials, safeImage, date, compatibilityPanel, updateHistory, gameCards, articleCover, homeHero, homeSection, topicTiles, promoBand, newsletterCard } from './templates.js';
 import { activeAds, adEligible, adMarkup, adCsp } from './ads.js';
+import { cspDirectives, cspHeaderValue } from '../csp.js';
+import { analyticsHead, withAnalytics } from './analytics.js';
 import { HOME_TITLE, DEFAULT_DESCRIPTION, FEED_CACHE, PUBLIC_FILE_CACHE, STATIC_SITEMAP_PATHS, absoluteUrl, articleNode, breadcrumbNode, collectionNode, graph, injectShellSeo, isoDate, knownImageSize, listingDescription, metaDescription, organizationNode, pageLabel, robotsTxt, rssFeed, shellSeo, sitemapIndex, sitemapUrlset, tagNames, twitterHandle, websiteNode } from '../seo.js';
 
 const STATIC_TITLES = { '/about': 'About Eliahtech Gaming', '/privacy': 'Privacy Policy', '/terms': 'Terms of Service', '/disclaimer': 'Disclaimer', '/dmca': 'DMCA and Copyright Policy' };
@@ -25,14 +27,14 @@ export function createWebRouter({ db, repo, auth, optionalAuth, requireAdmin, ap
   }
   const send = async (res, options) => {
     const nonce = options.nonce || randomBytes(18).toString('base64');
-    res.set('Content-Security-Policy', adCsp(nonce, options.siteScripts === true));
+    res.set('Content-Security-Policy', adCsp(nonce, options.siteScripts === true, options.noindex !== true));
     const cookie = res.req?.headers?.cookie || '';
     // HTML varies with the visitor's cookies, so shared caches and the CDN must never keep it. Signed-in pages are not stored at all;
     // anonymous pages may be kept by the browser but are always revalidated, which keeps back/forward navigation instant.
     res.set('Cache-Control', /(?:^|;\s*)(?:__Host-)?eliah_(?:at|rt)=/.test(cookie) ? 'private, no-store' : 'private, no-cache');
     res.vary('Cookie');
     const image = options.image || abs('/assets/gaming-cover.jpg');
-    res.type('html').send(layout({ browsing:browsingFromCookie(cookie), canonical: appUrl, image, imageSize: knownImageSize(image), twitterSite: twitterHandle(options.social), verification, nonce, ...options }));
+    res.type('html').send(layout({ browsing:browsingFromCookie(cookie), canonical: appUrl, image, imageSize: knownImageSize(image), twitterSite: twitterHandle(options.social), verification, nonce, analytics: options.noindex !== true, ...options }));
   };
   const page = req => Math.min(50000,Math.max(1,Number.parseInt(req.query.page,10)||1));
   const pager = (meta, current, base) => `<nav aria-label="Article pages" class="d-flex gap-3 my-4">${current>1?`<a class="btn btn-outline-primary" href="${base}${base.includes('?')?'&':'?'}page=${current-1}">← Previous</a>`:''}<span class="align-self-center">Page ${current}</span>${meta.has_more?`<a class="btn btn-outline-primary" href="${base}${base.includes('?')?'&':'?'}page=${current+1}">Next →</a>`:''}</nav>`;
@@ -172,7 +174,10 @@ export function createWebRouter({ db, repo, auth, optionalAuth, requireAdmin, ap
     if(!cfg.index){res.set('Cache-Control','private, no-store').set('X-Robots-Tag','noindex, nofollow');}
     else res.set('Cache-Control',SHELL_CACHE);
     const social=cfg.index?(await branding().catch(()=>({social:[]}))).social:[];
-    res.type('html').send(injectShellSeo(shell,{pathname:req.path,appUrl,image:abs('/assets/gaming-cover.jpg'),social}));
+    let page=injectShellSeo(shell,{pathname:req.path,appUrl,image:abs('/assets/gaming-cover.jpg'),social});
+    // Public app pages carry the tag manager; sign-in, payment and admin pages never do.
+    if(cfg.index){page=page.replace('</head>',analyticsHead()+'</head>');res.set('Content-Security-Policy',cspHeaderValue(withAnalytics(cspDirectives)));}
+    res.type('html').send(page);
   }));
   router.use((err,req,res,next)=>{
     if(req.path.startsWith('/api/'))return next(err);

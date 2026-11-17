@@ -23,7 +23,7 @@ Use `.env` locally and Vercel Project Settings → Environment Variables in prod
 | `RESEND_API_KEY` | secret | optional | re_… API key |
 | `EMAIL_FROM` | config | optional | Name <address@domain> or address@domain |
 | `EMAIL_TIMEOUT_MS` | config | optional | integer 1000–60000 |
-| `GOOGLE_SITE_VERIFICATION` | config | optional | token from Google Search Console (HTML tag method) |
+| `GOOGLE_SITE_VERIFICATION` | config | optional | token from Google Search Console (HTML tag method); the site's own token is built into server.js, set this only to override it |
 | `BING_SITE_VERIFICATION` | config | optional | token from Bing Webmaster Tools (HTML meta tag method) |
 | `NEWSLETTER_BATCH_SIZE` | config | optional | integer 1–50 (emails claimed per request; default 50) |
 | `NEWSLETTER_DAILY_LIMIT` | config | optional | integer 1–1000 (newsletter emails per UTC day; default 30; the admin setting overrides it) |

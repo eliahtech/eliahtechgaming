@@ -125,3 +125,17 @@ test('the Adsterra site script is deferred so it can reach document.body; the Mo
  const abs=tags.find((t)=>t.includes('abscloud.org'));const monetag=tags.find((t)=>t.includes('quge5.com'));
  assert.match(abs,/ defer /);assert.doesNotMatch(abs,/ async/);assert.match(monetag,/ async /);assert.doesNotMatch(monetag,/ defer/);
 });
+test('Google Tag Manager runs on public indexable pages only, with a policy that lets it load and a same-site init file',async()=>{
+ const GTM=/<script src="\/gtm-init\.js"><\/script><script async src="https:\/\/www\.googletagmanager\.com\/gtm\.js\?id=GTM-WH2NL9LW"><\/script>/;
+ const get=(csp,name)=>(csp||'').split('; ').find((d)=>d.startsWith(name+' '))||'';
+ const home=await request(site()).get('/');
+ assert.match(home.text,GTM);
+ assert.match(get(home.headers['content-security-policy'],'script-src'),/https:\/\/www\.googletagmanager\.com/);
+ assert.match(get(home.headers['content-security-policy'],'connect-src'),/https:\/\/\*\.google-analytics\.com/);
+ assert.doesNotMatch(get(home.headers['content-security-policy'],'script-src'),/unsafe-inline|unsafe-eval/);assert.doesNotMatch(get(home.headers['content-security-policy'],'connect-src'),/ https:(?: |$)/);
+ assert.match((await request(site()).get('/posts/ppsspp-guide')).text,GTM);
+ const premium=await request(site()).get('/premium');assert.match(premium.text,GTM);assert.match(get(premium.headers['content-security-policy'],'script-src'),/googletagmanager/);
+ for(const url of ['/login','/search','/community','/payment/return']){const res=await request(site()).get(url);assert.doesNotMatch(res.text,/googletagmanager|gtm-init/,url);assert.doesNotMatch(res.headers['content-security-policy']||'',/googletagmanager/,url);}
+ const init=(await import('node:fs')).readFileSync(path.join(root,'gtm-init.js'),'utf8');
+ assert.match(init,/window\.dataLayer\s*=\s*window\.dataLayer\s*\|\|\s*\[\]/);assert.match(init,/'gtm\.start'/);assert.match(init,/event:\s*'gtm\.js'/);
+});
