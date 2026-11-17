@@ -384,3 +384,20 @@ test('payment migration: idempotency, ownership and privilege rules are present'
   }
   assert.match(sql, /if v_pay\.status in \('completed', 'refunded'\) then/); // a late event can never resurrect or double-grant
 });
+
+test('a provider that cannot be reached is logged with its technical reason, never with credentials, and the customer message stays generic', async () => {
+  const { createPayPalProvider } = await import('../src/payments/paypal.js');
+  const { createPesaPalProvider } = await import('../src/payments/pesapal.js');
+  const logs = []; const original = console.error; console.error = (line) => logs.push(String(line));
+  try {
+    const boom = () => { const e = new TypeError('fetch failed'); e.cause = Object.assign(new Error('socket hang up'), { code: 'ECONNRESET' }); throw e; };
+    const paypal = createPayPalProvider({ env: { PAYPAL_BASE_URL: 'https://api-m.paypal.com', PAYPAL_CLIENT_ID: 'CLIENT_ID_SECRET_1', PAYPAL_CLIENT_SECRET: 'CLIENT_SECRET_VALUE_2' }, fetchImpl: boom });
+    await assert.rejects(() => paypal.createOrder({ paymentId: 'pay-1', amount: '2.99', description: 'Premium', returnUrl: 'https://x.example/r', cancelUrl: 'https://x.example/c' }), (e) => e.status === 502 && /could not be reached/.test(e.message));
+  } finally { console.error = original; }
+  const line = logs.find((l) => l.includes('payment_provider_unreachable'));
+  assert.ok(line, 'transport failure is logged');
+  const entry = JSON.parse(line);
+  assert.equal(entry.provider, 'paypal'); assert.equal(entry.step, 'oauth_token'); assert.equal(entry.code, 'ECONNRESET'); assert.match(entry.message, /socket hang up/);
+  assert.doesNotMatch(logs.join(' '), /CLIENT_ID_SECRET_1|CLIENT_SECRET_VALUE_2|Basic /);
+  assert.equal(typeof createPesaPalProvider, 'function');
+});

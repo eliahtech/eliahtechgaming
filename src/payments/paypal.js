@@ -1,5 +1,6 @@
 // PayPal Orders v2 (https://developer.paypal.com/docs/api/orders/v2/) and Webhooks verification. No SDK needed.
 import { AppError } from '../errors.js';
+import { logTransportError } from './transport-log.js';
 
 const HOSTS = new Set(['https://api-m.sandbox.paypal.com', 'https://api-m.paypal.com']);
 // Currencies PayPal accepts that use two decimal places (the amount checks below assume cents).
@@ -23,7 +24,7 @@ export function createPayPalProvider({ env = process.env, fetchImpl, now = () =>
     let res;
     try {
       res = await f(`${base()}/v1/oauth2/token`, { method: 'POST', headers: { Authorization: `Basic ${Buffer.from(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`, 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' }, body: 'grant_type=client_credentials' });
-    } catch { throw new AppError('PAYMENT_PROVIDER_ERROR', 'PayPal could not be reached.', 502); }
+    } catch (error) { logTransportError('paypal', 'oauth_token', error); throw new AppError('PAYMENT_PROVIDER_ERROR', 'PayPal could not be reached.', 502); }
     if (!res.ok) { console.error(JSON.stringify({ level: 'error', msg: 'paypal_auth_failed', status: res.status })); throw new AppError('PAYMENT_PROVIDER_ERROR', 'Could not authenticate with PayPal.', 502); }
     const data = await res.json();
     cached = { value: data.access_token, expires: now() + Number(data.expires_in || 300) * 1000 };
@@ -35,7 +36,7 @@ export function createPayPalProvider({ env = process.env, fetchImpl, now = () =>
     let res;
     try {
       res = await f(`${base()}${path}`, { method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json', ...(requestId ? { 'PayPal-Request-Id': requestId } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
-    } catch { throw new AppError('PAYMENT_PROVIDER_ERROR', 'PayPal could not be reached.', 502); }
+    } catch (error) { logTransportError('paypal', 'api_call', error); throw new AppError('PAYMENT_PROVIDER_ERROR', 'PayPal could not be reached.', 502); }
     const data = await res.json().catch(() => null);
     if (!res.ok) throw new PayPalError(res.status, data?.name, data?.details?.[0]?.issue, data?.debug_id);
     return data;

@@ -7,6 +7,7 @@
 //   GET  Transactions/GetTransactionStatus?orderTrackingId=  -> the only trusted source of a payment's result
 // The callback and IPN requests carry NO payment status (PesaPal's own rule), so nothing here ever reads a status from them.
 import { randomBytes } from 'node:crypto';
+import { logTransportError } from './transport-log.js';
 import { AppError } from '../errors.js';
 
 // The ONE place environment URLs live (docs: sandbox https://cybqa.pesapal.com/pesapalv3, live https://pay.pesapal.com/v3).
@@ -80,7 +81,7 @@ export function createPesaPalProvider({ env = process.env, fetchImpl, now = () =
     let res;
     try {
       res = await f(`${c.base}/Auth/RequestToken`, { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ consumer_key: env.PESAPAL_CONSUMER_KEY, consumer_secret: env.PESAPAL_CONSUMER_SECRET }) });
-    } catch { throw providerError(); }
+    } catch (error) { logTransportError('pesapal', 'auth_token', error); throw providerError(); }
     const data = await res.json().catch(() => null);
     if (!res.ok || !data?.token || data?.error) {
       console.error(JSON.stringify({ level: 'error', msg: 'pesapal_auth_failed', http: res.status, code: data?.error?.code ?? null, error_type: data?.error?.error_type ?? null }));
@@ -105,7 +106,7 @@ export function createPesaPalProvider({ env = process.env, fetchImpl, now = () =
     let res;
     try {
       res = await f(`${c.base}${path}${qs}`, { method, headers: { Authorization: `Bearer ${token}`, Accept: 'application/json', 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
-    } catch { throw providerError(); }
+    } catch (error) { logTransportError('pesapal', 'api_call', error); throw providerError(); }
     if (res.status === 401 && !retried) { cached = null; return call(method, path, { body, query }, true); } // expired token: refresh once
     const data = await res.json().catch(() => null);
     if (!res.ok || data === null || (data && !Array.isArray(data) && data.error && (data.error.code || data.error.message || data.error.error_type))) {
