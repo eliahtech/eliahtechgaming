@@ -401,3 +401,13 @@ test('a provider that cannot be reached is logged with its technical reason, nev
   assert.doesNotMatch(logs.join(' '), /CLIENT_ID_SECRET_1|CLIENT_SECRET_VALUE_2|Basic /);
   assert.equal(typeof createPesaPalProvider, 'function');
 });
+
+test('PayPal credentials pasted with stray spaces or a trailing newline still authenticate', async () => {
+  const seen = [];
+  const fetchImpl = async (url, options) => { seen.push({ url, auth: options.headers.Authorization }); return { ok: true, status: 200, json: async () => ({ access_token: 'tok', expires_in: 300 }) }; };
+  const paypal = createPayPalProvider({ env: { PAYPAL_BASE_URL: 'https://api-m.paypal.com', PAYPAL_CLIENT_ID: '  my-client-id\n', PAYPAL_CLIENT_SECRET: ' my-secret \r\n' }, fetchImpl });
+  try { await paypal.createOrder({ paymentId: 'pay-1', amount: '2.99', description: 'Premium', returnUrl: 'https://x.example/r', cancelUrl: 'https://x.example/c' }); } catch { /* only the token request matters here */ }
+  const token = seen.find((s) => s.url.endsWith('/v1/oauth2/token'));
+  assert.ok(token, 'token requested');
+  assert.equal(Buffer.from(token.auth.replace('Basic ', ''), 'base64').toString(), 'my-client-id:my-secret');
+});
