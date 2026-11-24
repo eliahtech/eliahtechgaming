@@ -6,7 +6,7 @@
 4. Back up the database and apply only pending migrations. Do not rerun initialization migrations on an existing project.
 5. Configure Supabase Auth Site URL and allowed redirects for /login, /reset-password and /api/auth/google/callback. Enable Google in Supabase before setting GOOGLE_AUTH_ENABLED=true.
 6. Preserve/configure the existing media bucket (see src/admin/media.js and the CMS migration). Uploads go to Supabase, never persistent Vercel disk.
-7. Configure Resend/PesaPal/PayPal credentials for integrations you use. PesaPal: /api/v1/payments/pesapal/ipn and /api/v1/payments/pesapal/callback. PayPal: /api/v1/payments/webhooks/paypal. Test sandbox transactions first.
+7. Configure Brevo (BREVO_API_KEY, or Resend as a fallback)/PesaPal/PayPal credentials for integrations you use. PesaPal: /api/v1/payments/pesapal/ipn and /api/v1/payments/pesapal/callback. PayPal: /api/v1/payments/webhooks/paypal. Test sandbox transactions first.
 8. Configure GROQ_API_KEY, GEMINI_API_KEY and optionally OPENROUTER_API_KEY as server secrets. Test account access and verify free-tier eligibility before enabling new model candidates.
 9. For ads, https://bauval.org (Adsterra) is approved in code (src/web/ads.js). To approve more networks, set AD_ALLOWED_ORIGINS to comma-separated exact HTTPS origins documented by your platform (scripts, frames and connections); leaving it blank keeps only the built-in origin. Add placements and enable the global ads switch. Do not weaken the whole-site security policy.
 10. Check /api/v1/health/supabase, direct post visits, login, uploads, premium protection and provider sandbox flows before launch.

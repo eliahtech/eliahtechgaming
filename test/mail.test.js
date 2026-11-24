@@ -476,3 +476,77 @@ test('daily runner: continues the oldest campaign; moves to the next one only wh
   assert.equal(delivered.length, 30);
   assert.deepEqual((await mail.campaigns.processDaily()).map((r) => r.sent), [0]); // calling again the same day sends nothing
 });
+
+// ---- Brevo ----
+const BREVO_KEY = 'xkeysib-test-key-0123456789';
+function brevoHarness(respond, extraEnv = {}) {
+  const calls = []; const events = [];
+  const fetchImpl = async (url, init) => { calls.push({ url, init, body: JSON.parse(init.body) }); const r = await respond(calls[calls.length - 1], calls.length); const status = r.status ?? 201; return { ok: status < 400, status, json: async () => r.body ?? { messageId: `<id-${calls.length}@brevo>` } }; };
+  const db = { insert: async (table, rows) => { events.push(...rows); return null; } };
+  return { svc: createEmailService({ db, fetchImpl, env: { BREVO_API_KEY: BREVO_KEY, EMAIL_FROM: 'Eliah Tech <no-reply@example.com>', ...extraEnv } }), calls, events };
+}
+
+test('Brevo: one request per message to the v3 API, key only in the api-key header, documented field names', async () => {
+  const { svc, calls, events } = brevoHarness(() => ({}));
+  const results = await svc.send([{ ...msg('a@b.co'), replyTo: 'r@b.co' }, msg('c@d.co')], { type: 'unit' });
+  assert.deepEqual(results, [{ ok: true }, { ok: true }]);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0].url, 'https://api.brevo.com/v3/smtp/email');
+  assert.equal(calls[0].init.headers['api-key'], BREVO_KEY);
+  assert.equal('Authorization' in calls[0].init.headers, false);
+  assert.equal(calls[0].url.includes(BREVO_KEY) || calls[0].init.body.includes(BREVO_KEY), false);
+  assert.deepEqual(calls[0].body, { sender: { email: 'no-reply@example.com', name: 'Eliah Tech' }, to: [{ email: 'a@b.co' }], subject: 'Hello', htmlContent: '<p>Hi</p>', textContent: 'Hi', replyTo: { email: 'r@b.co' } });
+  assert.deepEqual(calls[1].body.to, [{ email: 'c@d.co' }]); assert.equal('replyTo' in calls[1].body, false);
+  assert.deepEqual(events.map((e) => [e.to_email, e.status]), [['a@b.co', 'sent'], ['c@d.co', 'sent']]);
+});
+
+test('Brevo: a bare sender address, a quoted name and a key with stray spaces all work; List-Unsubscribe is not forwarded', async () => {
+  let h = brevoHarness(() => ({}), { EMAIL_FROM: 'no-reply@example.com', BREVO_API_KEY: `  ${BREVO_KEY}\n` });
+  await h.svc.sendOne({ ...msg(), headers: { 'List-Unsubscribe': 'https://x.co/u?t=1' } }, { type: 't' });
+  assert.deepEqual(h.calls[0].body.sender, { email: 'no-reply@example.com' });
+  assert.equal(h.calls[0].init.headers['api-key'], BREVO_KEY);
+  assert.equal('headers' in h.calls[0].body, false);
+  h = brevoHarness(() => ({}), { EMAIL_FROM: '"Eliah Tech Gaming" <hello@example.com>' });
+  await h.svc.sendOne(msg(), { type: 't' });
+  assert.deepEqual(h.calls[0].body.sender, { email: 'hello@example.com', name: 'Eliah Tech Gaming' });
+});
+
+test('Brevo: a rejected message fails alone, the reason is logged without the key, and sendOne maps it to EMAIL_FAILED', async () => {
+  const lines = []; const log = console.error; console.error = (l) => lines.push(String(l));
+  try {
+    const { svc, events } = brevoHarness((call) => (call.body.to[0].email === 'bad@b.co' ? { status: 401, body: { code: 'unauthorized', message: 'Key not found' } } : {}));
+    const results = await svc.send([msg('ok@b.co'), msg('bad@b.co'), msg('ok2@b.co')], { type: 'unit' });
+    assert.deepEqual(results.map((r) => r.ok), [true, false, true]);
+    assert.match(results[1].error, /unauthorized: Key not found/);
+    assert.deepEqual(events.map((e) => e.status), ['sent', 'failed', 'sent']);
+    await assert.rejects(() => brevoHarness(() => ({ status: 400, body: { code: 'invalid_parameter', message: 'bad sender' } })).svc.sendOne(msg(), { type: 't' }), (e) => e.code === 'EMAIL_FAILED' && e.status === 502);
+  } finally { console.error = log; }
+  assert.ok(lines.some((l) => l.includes('email_send_failed') && l.includes('"provider":"brevo"')));
+  assert.equal(lines.join(' ').includes(BREVO_KEY), false);
+});
+
+test('Brevo: network failures and timeouts are results, never thrown; many messages are sent a few at a time in order', async () => {
+  const lines = []; const log = console.error; console.error = (l) => lines.push(String(l));
+  try {
+    const down = createEmailService({ db: { insert: async () => null }, fetchImpl: async () => { throw new TypeError('fetch failed'); }, env: { BREVO_API_KEY: BREVO_KEY, EMAIL_FROM: 'no-reply@example.com' } });
+    assert.deepEqual((await down.send([msg()], { type: 't' })).map((r) => r.ok), [false]);
+    let inFlight = 0; let peak = 0;
+    const slow = createEmailService({ db: { insert: async () => null }, env: { BREVO_API_KEY: BREVO_KEY, EMAIL_FROM: 'no-reply@example.com' },
+      fetchImpl: async (url, init) => { inFlight += 1; peak = Math.max(peak, inFlight); await new Promise((r) => setTimeout(r, 5)); inFlight -= 1; return { ok: !init.body.includes('bad@b.co'), status: init.body.includes('bad@b.co') ? 400 : 201, json: async () => ({ messageId: 'x' }) }; } });
+    const addresses = Array.from({ length: 12 }, (_, i) => (i === 7 ? 'bad@b.co' : `u${i}@b.co`));
+    const results = await slow.send(addresses.map((a) => msg(a)), { type: 'n' });
+    assert.deepEqual(results.map((r) => r.ok), addresses.map((a) => a !== 'bad@b.co'));   // results keep the input order
+    assert.ok(peak > 1 && peak <= 5, `parallel requests stay between 2 and 5 (saw ${peak})`);
+  } finally { console.error = log; }
+});
+
+test('provider choice: Brevo when its key is set (even if Resend is too), Resend otherwise, and a clear error when neither is set', async () => {
+  const both = brevoHarness(() => ({}), { RESEND_API_KEY: 're_test_key_0123456789' });
+  await both.svc.sendOne(msg(), { type: 't' });
+  assert.equal(both.calls[0].url, 'https://api.brevo.com/v3/smtp/email');
+  const { svc, calls } = mailHarness(allOk); await svc.sendOne(msg(), { type: 't' });
+  assert.equal(calls[0].url, 'https://api.resend.com/emails/batch');
+  const none = (e) => createEmailService({ db: { insert: async () => null }, fetchImpl: async () => ({}), env: e });
+  await assert.rejects(() => none({ EMAIL_FROM: env.EMAIL_FROM }).send([msg()], {}), (e) => e instanceof ConfigError && /BREVO_API_KEY/.test(e.message));
+  await assert.rejects(() => none({ BREVO_API_KEY: BREVO_KEY, EMAIL_FROM: 'not-an-address' }).send([msg()], {}), ConfigError);
+});

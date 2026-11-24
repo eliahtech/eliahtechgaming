@@ -77,7 +77,7 @@ Not implemented and not enabled. PesaPal documents recurring payments for specif
 
 ## Notification emails
 
-Through the Resend mailer: payment started, payment received / subscription activated, payment failed. Best effort (a mail failure never changes a payment). **Subscription-expiry emails are not implemented**: they need a scheduled job (for example Vercel Cron), which the project does not have yet.
+Through the mailer (Brevo, or Resend when no Brevo key is set): payment started, payment received / subscription activated, payment failed. Best effort (a mail failure never changes a payment). **Subscription-expiry emails are not implemented**: they need a scheduled job (for example Vercel Cron), which the project does not have yet.
 
 ## Testing
 

@@ -1,5 +1,5 @@
 // Pure helpers for the daily-capped newsletter sender (no I/O, easy to test).
-// A "day" is the UTC calendar day because that is when Resend's free-plan daily quota resets
+// A "day" is the UTC calendar day (when Resend's free-plan daily quota resets; the 30-a-day default is far below Brevo's free 300 a day too)
 // (00:00 UTC = 03:00 in Kenya).
 export const DEFAULT_DAILY_LIMIT = 30;
 export const MAX_DAILY_LIMIT = 1000;

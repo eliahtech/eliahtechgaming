@@ -37,6 +37,7 @@ export const ENV_SPEC = [
   { name: 'SUPABASE_SERVICE_ROLE_KEY', group: 'supabase', scope: 'secret', required: 'production', format: 'service-role/secret key (server only)', check: isJwtLike },
   { name: 'SUPABASE_AUTH_HOOK_SECRET', group: 'supabase', scope: 'secret', required: false, format: 'webhook signing secret', check: isSecret },
 
+  { name: 'BREVO_API_KEY', group: 'email', scope: 'secret', required: false, format: 'xkeysib-… API key (Brevo)', check: (v) => v.trim().length >= 8 && !/\s/.test(v.trim()) },
   { name: 'RESEND_API_KEY', group: 'email', scope: 'secret', required: false, format: 're_… API key', check: (v) => v.length >= 8 && !/\s/.test(v) },
   { name: 'EMAIL_FROM', group: 'email', scope: 'config', required: false, format: 'Name <address@domain> or address@domain', check: (v) => /^(.+<)?[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+>?$/.test(v) },
   { name: 'EMAIL_TIMEOUT_MS', group: 'email', scope: 'config', required: false, format: 'integer 1000–60000', check: (v) => isInt(v, 1000, 60000) },
@@ -129,7 +130,7 @@ export function validateEnv(env = process.env, { mode } = {}) {
     supabase: groupState('supabase', ALL_OR_NOTHING.supabase),
     pesapal: groupState('pesapal', ALL_OR_NOTHING.pesapal),
     paypal: groupState('paypal', ALL_OR_NOTHING.paypal),
-    email: groupState('email', ['RESEND_API_KEY']),
+    email: present.has('BREVO_API_KEY') ? groupState('email', ['BREVO_API_KEY']) : groupState('email', ['RESEND_API_KEY']),
     ai: present.has('GROQ_API_KEY') || present.has('GEMINI_API_KEY') ? (badVars.has('GROQ_API_KEY') || badVars.has('GEMINI_API_KEY') ? 'INVALID' : 'CONFIGURED') : 'NOT CONFIGURED',
   };
   return { ok: errors.length === 0, production, errors, integrations };

@@ -20,7 +20,8 @@ Use `.env` locally and Vercel Project Settings → Environment Variables in prod
 | `SUPABASE_ANON_KEY` | secret | production | anon/publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | secret | production | service-role/secret key (server only) |
 | `SUPABASE_AUTH_HOOK_SECRET` | secret | optional | webhook signing secret |
-| `RESEND_API_KEY` | secret | optional | re_… API key |
+| `BREVO_API_KEY` | secret | optional | xkeysib-… API key from Brevo (SMTP & API > API keys). If set, Brevo sends all email |
+| `RESEND_API_KEY` | secret | optional | re_… API key; used only when `BREVO_API_KEY` is not set |
 | `EMAIL_FROM` | config | optional | Name <address@domain> or address@domain |
 | `EMAIL_TIMEOUT_MS` | config | optional | integer 1000–60000 |
 | `GOOGLE_SITE_VERIFICATION` | config | optional | token from Google Search Console (HTML tag method); the site's own token is built into server.js, set this only to override it |

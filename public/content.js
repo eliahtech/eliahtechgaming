@@ -1,5 +1,5 @@
 // Page copy for Eliah Tech. Legal pages describe how the platform is designed to operate
-// (Supabase, Resend email, PesaPal/PayPal payments, AI providers, ads).
+// (Supabase, Brevo email, PesaPal/PayPal payments, AI providers, ads).
 // Have a qualified lawyer review them before launch, and update if your setup changes.
 
 export const LEGAL_UPDATED = 'September 30, 2026';
@@ -51,7 +51,7 @@ export const pages = {
 <ul><li>To create and secure your account and provide Premium features</li><li>To reply to your messages and send transactional emails such as verification and password reset</li><li>To send newsletters, only if you subscribed</li><li>To prevent abuse, fraud and spam</li><li>To improve content and performance</li></ul>
 <h2>3. Service providers</h2>
 <p>We share only what is needed with providers that help us operate the service:</p>
-<ul><li><strong>Supabase</strong> for database, authentication and file storage</li><li><strong>Vercel</strong> for hosting</li><li><strong>Resend</strong> for sending emails</li><li><strong>PesaPal and PayPal</strong> for payment processing</li><li><strong>AI model providers</strong> to generate assistant replies</li><li><strong>Advertising partners</strong> such as Google AdSense on non-home public pages, for free visitors</li></ul>
+<ul><li><strong>Supabase</strong> for database, authentication and file storage</li><li><strong>Vercel</strong> for hosting</li><li><strong>Brevo</strong> for sending emails</li><li><strong>PesaPal and PayPal</strong> for payment processing</li><li><strong>AI model providers</strong> to generate assistant replies</li><li><strong>Advertising partners</strong> such as Google AdSense on non-home public pages, for free visitors</li></ul>
 <p>We do not sell your personal information.</p>
 <h2>4. Cookies and similar technologies</h2>
 <p>We use essential cookies or browser storage to keep you signed in and protect the site. Advertising partners may use cookies to show and measure ads. You can control cookies in your browser settings, and Premium users can browse without ads.</p>

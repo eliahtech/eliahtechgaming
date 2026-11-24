@@ -33,3 +33,9 @@ On the free Vercel plan the job runs once a day at some point within its schedul
 
 ## Upgrading
 Apply `supabase/migrations/20261028100000_newsletter_daily_cap.sql` after a backup (health marker `20261028_newsletter_daily_cap`). It adds retry bookkeeping, the paused status and the fixed-audience rule. It does not change existing subscribers, campaigns or sent history.
+
+## Brevo
+
+When `BREVO_API_KEY` is set, Brevo sends every email (payment, sign-up, contact replies and newsletters); Resend is used only when that key is empty. Brevo's free plan allows 300 emails per day, so the default limit of 30 a day sits well below it. Brevo takes one message per request here, so the `List-Unsubscribe` header is not sent through Brevo; each newsletter still contains its own personal unsubscribe link in the message body.
+
+Set `EMAIL_FROM` to an address you verified under **Senders, Domains & Dedicated IPs** in Brevo. A free address such as `@gmail.com` can be verified with a code and will deliver, but Brevo replaces its domain with its own and Gmail, Yahoo and Microsoft may filter those messages as spam. A domain you own, authenticated in Brevo, is the reliable long-term setup.

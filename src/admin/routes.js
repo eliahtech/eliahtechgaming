@@ -175,7 +175,7 @@ export function createAdminRouter({ db, requireAdmin, sanitize, fetchImpl, email
         ai_keys: { gemini: present('GEMINI_API_KEY'), groq: present('GROQ_API_KEY') },
         ads_allowed_origins_set: present('AD_ALLOWED_ORIGINS'),
         payments: { paypal: present('PAYPAL_CLIENT_ID'), pesapal: present('PESAPAL_CONSUMER_KEY') },
-        email_configured: present('RESEND_API_KEY'),
+        email_configured: present('BREVO_API_KEY') || present('RESEND_API_KEY'),
         site_verification: { google: present('GOOGLE_SITE_VERIFICATION'), bing: present('BING_SITE_VERIFICATION') },
       },
       checked_at: new Date().toISOString(),
