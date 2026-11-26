@@ -156,14 +156,37 @@ function renderAuth(mode) {
   document.querySelector('#auth-form').addEventListener('submit', (event) => submitForm(event, async () => {
     const email = document.querySelector('#auth-email').value; const password = document.querySelector('#auth-password').value;
     if (isLogin) {
-      const data = await api('/auth/login', { method: 'POST', noAuth: true, body: JSON.stringify({ email, password }) });
+      let data;
+      try { data = await api('/auth/login', { method: 'POST', noAuth: true, body: JSON.stringify({ email, password }) }); }
+      catch (error) { if (error.code === 'EMAIL_NOT_VERIFIED') { window.history.pushState({}, '', `/verify-email?email=${encodeURIComponent(email)}`); route(); toast('Your email is not verified yet. Enter the code we sent, or request a new one.'); return; } throw error; }
       session.set(data.session); state.user = data.user; toast('Welcome back.'); window.history.pushState({}, '', takeNext() || homeFor(data.user)); route();
     } else {
       const data = await api('/auth/register', { method: 'POST', noAuth: true, body: JSON.stringify({ email, password, display_name: document.querySelector('#auth-name').value }) });
       if (data.session) { session.set(data.session); await loadUser(); window.history.pushState({}, '', '/profile'); route(); return; }
-      toast(data.message); event.target.reset();
+      window.history.pushState({}, '', `/verify-email?email=${encodeURIComponent(email)}`); route(); toast('We sent a verification code to your email. Enter it below.');
     }
   }));
+}
+
+function renderVerifyEmail() {
+  setMeta('Verify your email', 'Enter the verification code sent to your email address.');
+  const presetEmail = new URLSearchParams(window.location.search).get('email') || '';
+  shell(`${pageHero('VERIFY YOUR EMAIL', 'Enter your verification code.', 'We sent a numeric code to your email. Enter it below to activate your account and start your free trial.')}${formCard(`${field('verify-email', 'Email', 'email', 'autocomplete="email" required')}${field('verify-code', 'Verification code', 'text', 'inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" minlength="6" maxlength="10" required')}<button class="btn btn-brand w-100 mt-2" type="submit">Verify email</button><p class="text-secondary small mt-3 mb-0">Did not get a code? Check your spam folder, or <button class="btn btn-link btn-sm p-0 align-baseline" type="button" id="verify-resend">send a new code</button>.<br><a class="section-link" href="/login">Back to sign in</a></p>`)}`);
+  document.querySelector('#verify-email').value = presetEmail;
+  document.querySelector('#verify-code').focus();
+  document.querySelector('#auth-form').addEventListener('submit', (event) => submitForm(event, async () => {
+    const data = await api('/auth/verify-email', { method: 'POST', noAuth: true, body: JSON.stringify({ email: document.querySelector('#verify-email').value, code: document.querySelector('#verify-code').value }) });
+    session.set(data.session); state.user = data.user; toast('Email verified. Welcome!');
+    window.history.pushState({}, '', takeNext() || homeFor(data.user)); route();
+  }));
+  const resend = document.querySelector('#verify-resend');
+  resend.addEventListener('click', async () => {
+    const email = document.querySelector('#verify-email').value;
+    if (!email) { toast('Enter your email address first.'); return; }
+    resend.disabled = true;
+    try { const data = await api('/auth/resend-code', { method: 'POST', noAuth: true, body: JSON.stringify({ email }) }); toast(data.message); } catch (error) { toast(error.message); }
+    setTimeout(() => { resend.disabled = false; }, 60000);
+  });
 }
 
 function renderForgot() {
@@ -297,7 +320,7 @@ async function route() {
   const main = document.querySelector('main');
   if (main) { main.setAttribute('tabindex', '-1'); main.focus({ preventScroll: true }); }
 }
-async function dispatch() { const pathname = (window.location.pathname.replace(/\/$/, '') || '/').replace(/\.html$/, '') || '/'; if (pathname === '/') return renderHome(); if (pathname === '/ai') return renderAiRoute(); if (pathname === '/services') { window.location.assign('/categories'); return; } if (pathname === '/premium') return renderPremium(); if (pathname === '/search') return renderSearch(); if (pathname === '/login' || pathname === '/register') return renderAuth(pathname.slice(1)); if (pathname === '/forgot-password') return renderForgot(); if (pathname === '/reset-password') return renderReset(); if (pathname === '/profile') return renderProfile(); if (pathname === '/payment/return') return renderPaymentReturn('return'); if (pathname === '/payment/cancel') return renderPaymentReturn('cancel'); if (pathname === '/newsletter/confirm') return renderNewsletterAction('confirm'); if (pathname === '/newsletter/unsubscribe') return renderNewsletterAction('unsubscribe'); if (pathname === '/admin' || pathname.startsWith('/admin/')) return renderAdminRoute(pathname); if (pathname.startsWith('/post/')) return renderPost(pathname.split('/').pop()); if (pathname.startsWith('/category/')) return renderCategory(pathname.split('/').pop()); const staticPage = pathname.slice(1); if (['about', 'contact', 'privacy', 'terms', 'disclaimer', 'dmca'].includes(staticPage)) return renderStatic(staticPage); return renderNotFound(); }
+async function dispatch() { const pathname = (window.location.pathname.replace(/\/$/, '') || '/').replace(/\.html$/, '') || '/'; if (pathname === '/') return renderHome(); if (pathname === '/ai') return renderAiRoute(); if (pathname === '/services') { window.location.assign('/categories'); return; } if (pathname === '/premium') return renderPremium(); if (pathname === '/search') return renderSearch(); if (pathname === '/login' || pathname === '/register') return renderAuth(pathname.slice(1)); if (pathname === '/forgot-password') return renderForgot(); if (pathname === '/verify-email') return renderVerifyEmail(); if (pathname === '/reset-password') return renderReset(); if (pathname === '/profile') return renderProfile(); if (pathname === '/payment/return') return renderPaymentReturn('return'); if (pathname === '/payment/cancel') return renderPaymentReturn('cancel'); if (pathname === '/newsletter/confirm') return renderNewsletterAction('confirm'); if (pathname === '/newsletter/unsubscribe') return renderNewsletterAction('unsubscribe'); if (pathname === '/admin' || pathname.startsWith('/admin/')) return renderAdminRoute(pathname); if (pathname.startsWith('/post/')) return renderPost(pathname.split('/').pop()); if (pathname.startsWith('/category/')) return renderCategory(pathname.split('/').pop()); const staticPage = pathname.slice(1); if (['about', 'contact', 'privacy', 'terms', 'disclaimer', 'dmca'].includes(staticPage)) return renderStatic(staticPage); return renderNotFound(); }
 const soft = (promise, fallback) => promise.catch(() => fallback);
 async function bootstrap() {
   try {

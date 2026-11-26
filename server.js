@@ -227,6 +227,28 @@ app.post('/api/v1/auth/register', limit('register', 5, 3600, strict), limit('reg
   return send(res, { message: 'Check your inbox to verify your email address, then sign in.', ...(result.session ? { session: result.session } : {}) }, 201);
 }));
 
+// Sign-up confirmation by code: the person types the numeric code from the email instead of opening the link.
+// The per-address limit keeps guessing a code (about a million possibilities) impractical.
+app.post('/api/v1/auth/verify-email', limit('verify-email', 20, 900, strict), limit('verify-email-address', 6, 900, { ...strict, keyOf: byBodyEmail }), wrap(async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+  const code = String(req.body?.code ?? '').replace(/\s+/g, '');
+  if (!email) return fail(res, 'VALIDATION_ERROR', 'Enter a valid email address.', 422);
+  if (!/^\d{6,10}$/.test(code)) return fail(res, 'VALIDATION_ERROR', 'Enter the numeric code from your email.', 422);
+  const { session, user } = await auth.verifyEmailCode({ email, code });
+  if (!session || !user) return fail(res, 'INVALID_CODE', 'That code is incorrect or has expired. Request a new one.', 422);
+  const context = await repo.getAccessContext(db, user.id);
+  const account = accountView({ ...user, emailVerified: user.email_verified, ...context, access: computeAccess(context) });
+  return send(res, { session, user: account });
+}));
+
+// A fresh code for an account that is still waiting for confirmation. Same answer for every address (no account enumeration).
+app.post('/api/v1/auth/resend-code', limit('resend-code', 10, 3600, strict), limit('resend-code-email', 4, 3600, { ...strict, keyOf: byBodyEmail }), wrap(async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+  if (!email) return fail(res, 'VALIDATION_ERROR', 'Enter a valid email address.', 422);
+  try { await auth.resendSignupCode(email, `${appUrl}/login?verified=1`); } catch (error) { if (['RATE_LIMITED', 'AUTH_UNAVAILABLE'].includes(error?.code)) throw error; }
+  return send(res, { message: 'If that address has a pending account, a new code is on its way.' });
+}));
+
 app.post('/api/v1/auth/login', limit('login', 20, 900, strict), limit('login-email', 8, 900, { ...strict, keyOf: byBodyEmail }), wrap(async (req, res) => {
   const email = normalizeEmail(req.body?.email);
   if (!email || typeof req.body?.password !== 'string' || !req.body.password) return fail(res, 'VALIDATION_ERROR', 'Email and password are required.', 422);

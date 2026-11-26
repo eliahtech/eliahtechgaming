@@ -75,3 +75,22 @@ test('upstream 5xx and 429 never leak provider text', () => {
   assert.equal(mapAuthError(500, { msg: 'internal stack trace' }).message.includes('stack'), false);
   assert.equal(mapAuthError(429, {}).status, 429);
 });
+
+test('email code: verify posts the signup code and returns a trimmed session; an expired or wrong code is a clear 422, not a session error', async () => {
+  const { auth, calls } = client((call) => (call.body.token === '123456' ? { body: tokenBody } : { status: 403, body: { error_code: 'otp_expired', msg: 'Token has expired or is invalid' } }));
+  const out = await auth.verifyEmailCode({ email: 'a@b.co', code: '123456' });
+  assert.equal(calls[0].path, '/auth/v1/verify'); assert.equal(calls[0].method, 'POST');
+  assert.deepEqual(calls[0].body, { type: 'signup', email: 'a@b.co', token: '123456' });
+  assert.equal(out.session.access_token, 'AT'); assert.deepEqual(out.user, { id: 'u1', email: 'a@b.co', email_verified: true });
+  assert.equal(JSON.stringify(out).includes('app_metadata'), false);
+  await assert.rejects(() => auth.verifyEmailCode({ email: 'a@b.co', code: '000000' }), (e) => e.code === 'INVALID_CODE' && e.status === 422 && /incorrect or has expired/.test(e.message));
+  assert.equal(mapAuthError(403, { error_code: 'otp_expired' }).code, 'INVALID_CODE');
+  assert.equal(mapAuthError(403, { error_code: 'bad_jwt' }).code, 'INVALID_TOKEN');
+});
+
+test('email code: resend asks for a new signup code with the redirect', async () => {
+  const { auth, calls } = client(() => ({ body: {} }));
+  await auth.resendSignupCode('a@b.co', 'https://x.example/login?verified=1');
+  assert.equal(calls[0].path, '/auth/v1/resend'); assert.equal(calls[0].query.redirect_to, 'https://x.example/login?verified=1');
+  assert.deepEqual(calls[0].body, { type: 'signup', email: 'a@b.co' });
+});

@@ -550,3 +550,14 @@ test('provider choice: Brevo when its key is set (even if Resend is too), Resend
   await assert.rejects(() => none({ EMAIL_FROM: env.EMAIL_FROM }).send([msg()], {}), (e) => e instanceof ConfigError && /BREVO_API_KEY/.test(e.message));
   await assert.rejects(() => none({ BREVO_API_KEY: BREVO_KEY, EMAIL_FROM: 'not-an-address' }).send([msg()], {}), ConfigError);
 });
+
+test('sign-up email carries the numeric code next to the link; other emails and non-numeric tokens do not', () => {
+  const base = { user: { email: 'u@x.co' } };
+  const signup = buildAuthEmail({ ...base, email_data: { email_action_type: 'signup', token: '482913', token_hash: 'hash123', redirect_to: 'https://x.example/login?verified=1' } }, { supabaseUrl: 'https://proj.supabase.co' });
+  assert.match(signup.html, />482913</); assert.match(signup.text, /Your verification code: 482913/);
+  assert.match(signup.html, /proj\.supabase\.co\/auth\/v1\/verify\?token=hash123/); assert.match(signup.text, /token=hash123/);
+  const hostile = buildAuthEmail({ ...base, email_data: { email_action_type: 'signup', token: '<script>x</script>', token_hash: 'h' } }, { supabaseUrl: 'https://proj.supabase.co' });
+  assert.doesNotMatch(hostile.html, /<script>x/); assert.doesNotMatch(hostile.html + hostile.text, /verification code/i);
+  const recovery = buildAuthEmail({ ...base, email_data: { email_action_type: 'recovery', token: '111111', token_hash: 'h2' } }, { supabaseUrl: 'https://proj.supabase.co' });
+  assert.doesNotMatch(recovery.html + recovery.text, /111111/);
+});

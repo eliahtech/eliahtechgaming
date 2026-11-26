@@ -73,7 +73,7 @@ export function rssFeed({ appUrl, title = `${SITE_NAME} guides`, description = D
 }
 // Search, account and payment pages are kept out of search results. Pages that must show a noindex tag are NOT blocked here
 // (a blocked page can never be crawled to see its noindex), only crawl traps and private areas are.
-export const robotsTxt = (appUrl) => ['User-agent: *', 'Allow: /', 'Disallow: /api/', 'Disallow: /admin', 'Disallow: /preview/', 'Disallow: /community', 'Disallow: /search', 'Disallow: /login', 'Disallow: /register', 'Disallow: /forgot-password', 'Disallow: /reset-password', 'Disallow: /auth/', 'Disallow: /payment/', 'Disallow: /newsletter/', '', `Sitemap: ${appUrl}/sitemap.xml`, ''].join('\n');
+export const robotsTxt = (appUrl) => ['User-agent: *', 'Allow: /', 'Disallow: /api/', 'Disallow: /admin', 'Disallow: /preview/', 'Disallow: /community', 'Disallow: /search', 'Disallow: /login', 'Disallow: /register', 'Disallow: /forgot-password', 'Disallow: /reset-password', 'Disallow: /verify-email', 'Disallow: /auth/', 'Disallow: /payment/', 'Disallow: /newsletter/', '', `Sitemap: ${appUrl}/sitemap.xml`, ''].join('\n');
 // Edge caching is safe for these because they are identical for every visitor (no cookies involved).
 export const PUBLIC_FILE_CACHE = 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400';
 export const FEED_CACHE = 'public, max-age=300, s-maxage=900, stale-while-revalidate=3600';
@@ -85,7 +85,7 @@ export const SHELL_PAGES = {
   '/services': { title: 'Gaming Setup and Support Services', h1: 'Gaming setup and support services', description: 'Get hands-on help with game installation, emulator settings and device optimisation from the Eliahtech Gaming team.' },
   '/ai': { title: 'Free AI Gaming Assistant', h1: 'Free AI gaming assistant', description: 'Ask the AI assistant about PPSSPP settings, Android lag fixes, game errors and setup. Free to try and built for gamers.' },
 };
-const PRIVATE_TITLES = { '/login': 'Sign in', '/register': 'Create your account', '/forgot-password': 'Reset your password', '/reset-password': 'Choose a new password', '/auth/callback': 'Signing you in', '/payment/return': 'Payment status', '/payment/cancel': 'Payment cancelled', '/newsletter/confirm': 'Confirm your subscription', '/newsletter/unsubscribe': 'Unsubscribe' };
+const PRIVATE_TITLES = { '/login': 'Sign in', '/register': 'Create your account', '/forgot-password': 'Reset your password', '/reset-password': 'Choose a new password', '/verify-email': 'Verify your email', '/auth/callback': 'Signing you in', '/payment/return': 'Payment status', '/payment/cancel': 'Payment cancelled', '/newsletter/confirm': 'Confirm your subscription', '/newsletter/unsubscribe': 'Unsubscribe' };
 export function shellSeo(pathname) {
   const path = String(pathname || '/').split('?')[0].replace(/\/+$/, '') || '/';
   if (SHELL_PAGES[path]) return { ...SHELL_PAGES[path], path, index: true };

@@ -41,6 +41,9 @@ export function authEmail({ type, url, code }) {
     return { subject: `Your ${SITE} confirmation code`, html: layout(`<h2 style="margin:0 0 12px">Confirmation code</h2><p style="font-size:26px;letter-spacing:4px;font-weight:bold">${esc(code)}</p><p>Enter this code to confirm the change.</p>`, 'If you did not request this, secure your account.'), text: `Your ${SITE} confirmation code: ${code}` };
   }
   const [heading, lead, label] = AUTH_COPY[type];
+  if (type === 'signup' && /^\d{4,10}$/.test(String(code ?? ''))) {
+    return { subject: `${heading} — ${SITE}`, html: layout(`<h2 style="margin:0 0 12px">${esc(heading)}</h2><p>${esc(lead)}</p><p style="margin:16px 0 4px">Your verification code:</p><p style="font-size:30px;letter-spacing:6px;font-weight:bold;margin:0 0 12px">${esc(code)}</p><p>Enter this code on the verification page, or use the button below instead.</p>${button(url, label)}`, 'If you did not request this, you can safely ignore this email.'), text: `${heading}\n\n${lead}\n\nYour verification code: ${code}\n\nEnter this code on the verification page, or open this link instead:\n${url}\n\nIf you did not request this, ignore this email.` };
+  }
   return { subject: `${heading} — ${SITE}`, html: layout(`<h2 style="margin:0 0 12px">${esc(heading)}</h2><p>${esc(lead)}</p>${button(url, label)}`, 'If you did not request this, you can safely ignore this email.'), text: `${heading}\n\n${lead}\n\n${url}\n\nIf you did not request this, ignore this email.` };
 }
 

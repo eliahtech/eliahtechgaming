@@ -13,6 +13,7 @@
     { "path": "/register", "title": "Register" },
     { "path": "/forgot-password", "title": "Forgot password" },
     { "path": "/reset-password", "title": "Reset password" },
+    { "path": "/verify-email", "title": "Verify email" },
     { "path": "/profile", "title": "Profile" },
     { "path": "/newsletter", "title": "Newsletter signup" },
     { "path": "/newsletter/:action", "title": "Newsletter action" },

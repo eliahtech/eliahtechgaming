@@ -20,6 +20,7 @@ export function mapAuthError(status, payload) {
   if (code === 'weak_password') return new AppError('WEAK_PASSWORD', text || 'That password is too weak.', 422);
   if (code === 'same_password') return new AppError('VALIDATION_ERROR', 'Choose a password you have not used before.', 422);
   if (/rate_limit/.test(code) || status === 429) return new AppError('RATE_LIMITED', 'Too many attempts. Please wait a few minutes and try again.', 429);
+  if (['otp_expired', 'otp_disabled'].includes(code)) return new AppError('INVALID_CODE', 'That code is incorrect or has expired. Request a new one.', 422);
   if (status === 401 || status === 403 || ['bad_jwt', 'session_not_found', 'refresh_token_not_found', 'refresh_token_already_used', 'no_authorization'].includes(code)) {
     return new AppError('INVALID_TOKEN', 'Your session is invalid or has expired. Sign in again.', 401);
   }
@@ -60,6 +61,12 @@ export function createAuthClient({ url, anonKey, fetchImpl } = {}) {
       const payload = await call('POST', '/token', { query: { grant_type: 'password' }, body: { email, password } });
       return { session: toSession(payload), user: publicUser(payload.user) };
     },
+    // Confirms the sign-up email with the numeric code from the email (the same one-time token the email link carries).
+    async verifyEmailCode({ email, code }) {
+      const payload = await call('POST', '/verify', { body: { type: 'signup', email, token: code } });
+      return payload?.access_token ? { session: toSession(payload), user: publicUser(payload.user) } : { session: null, user: null };
+    },
+    async resendSignupCode(email, redirectTo) { await call('POST', '/resend', { query: redirectTo ? { redirect_to: redirectTo } : {}, body: { type: 'signup', email } }); },
     async refresh(refreshToken) {
       const payload = await call('POST', '/token', { query: { grant_type: 'refresh_token' }, body: { refresh_token: refreshToken } });
       return { session: toSession(payload), user: publicUser(payload.user) };

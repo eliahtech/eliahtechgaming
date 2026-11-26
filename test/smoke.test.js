@@ -49,6 +49,11 @@ globalThis.fetch = async (url, init = {}) => {
       const id = token.startsWith('tok-') ? token.slice(4) : null;
       return id && profiles[id] ? json({ id, email: `${id}@x.co`, email_confirmed_at: '2026-01-01' }) : json({ error_code: 'bad_jwt' }, 401);
     }
+    if (route === '/verify') {
+      const body = JSON.parse(init.body);
+      if (body.type !== 'signup' || body.token !== '123456') return json({ error_code: 'otp_expired', msg: 'Token has expired or is invalid' }, 403);
+      return json({ access_token: `tok-${U.free}`, refresh_token: 'rt', expires_in: 3600, user: { id: U.free, email: body.email, email_confirmed_at: '2026-01-01' } });
+    }
     sent.push({ auth: route, method: init.method, body: init.body });
     return json({});
   }
@@ -295,4 +300,25 @@ test('admin billing and plans are admin-only', async () => {
     assert.equal((await request(app)[method](`/api/v1/admin${path}`)).status, 401, `${path} guest`);
     assert.equal((await request(app)[method](`/api/v1/admin${path}`).set(as(U.free))).status, 403, `${path} free user`);
   }
+});
+
+test('sign-up confirmation by code: a right code signs the person in, a wrong or malformed one is refused, a new code is requested without revealing accounts', async () => {
+  const ok = await request(app).post('/api/v1/auth/verify-email').send({ email: 'new@b.co', code: '123 456' });
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.data.session.access_token, `tok-${U.free}`);
+  assert.equal(ok.body.data.user.role, 'free_user');
+  assert.equal(JSON.stringify(ok.body).includes('app_metadata'), false);
+  const browser = await request(app).post('/api/v1/auth/verify-email').set('X-Eliah-Browser', '1').send({ email: 'new@b.co', code: '123456' });
+  assert.equal(browser.status, 200);
+  assert.ok((browser.headers['set-cookie'] || []).some((c) => /HttpOnly/i.test(c)), 'browser sign-in uses an HttpOnly cookie');
+  assert.equal(browser.body.data.session.cookie, true); assert.equal(JSON.stringify(browser.body).includes(`tok-${U.free}`), false);
+  const wrong = await request(app).post('/api/v1/auth/verify-email').send({ email: 'new@b.co', code: '000000' });
+  assert.equal(wrong.status, 422); assert.equal(wrong.body.error.code, 'INVALID_CODE');
+  assert.equal((await request(app).post('/api/v1/auth/verify-email').send({ email: 'new@b.co', code: 'abc' })).status, 422);
+  assert.equal((await request(app).post('/api/v1/auth/verify-email').send({ email: 'not-an-email', code: '123456' })).status, 422);
+  const before = sent.length;
+  const resend = await request(app).post('/api/v1/auth/resend-code').send({ email: 'anyone@b.co' });
+  assert.equal(resend.status, 200); assert.match(resend.body.data.message, /pending account/);
+  assert.ok(sent.slice(before).some((c) => c.auth === '/resend' && JSON.parse(c.body).type === 'signup'));
+  assert.equal((await request(app).post('/api/v1/auth/resend-code').send({ email: '' })).status, 422);
 });

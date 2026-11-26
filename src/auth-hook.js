@@ -33,5 +33,5 @@ export function buildAuthEmail(payload, { supabaseUrl }) {
   link.searchParams.set('token', data.token_hash);
   link.searchParams.set('type', type);
   if (data.redirect_to) link.searchParams.set('redirect_to', data.redirect_to);
-  return { to, ...authEmail({ type, url: link.toString() }) };
+  return { to, ...authEmail({ type, url: link.toString(), ...(type === 'signup' ? { code: data.token } : {}) }) };
 }

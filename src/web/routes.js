@@ -13,7 +13,7 @@ import { analyticsHead, withAnalytics } from './analytics.js';
 import { HOME_TITLE, DEFAULT_DESCRIPTION, FEED_CACHE, PUBLIC_FILE_CACHE, STATIC_SITEMAP_PATHS, absoluteUrl, articleNode, breadcrumbNode, collectionNode, graph, injectShellSeo, isoDate, knownImageSize, listingDescription, metaDescription, organizationNode, pageLabel, robotsTxt, rssFeed, shellSeo, sitemapIndex, sitemapUrlset, tagNames, twitterHandle, websiteNode } from '../seo.js';
 
 const STATIC_TITLES = { '/about': 'About Eliahtech Gaming', '/privacy': 'Privacy Policy', '/terms': 'Terms of Service', '/disclaimer': 'Disclaimer', '/dmca': 'DMCA and Copyright Policy' };
-const SHELL_PATHS = ['/admin', '/admin/' + '*', '/ai', '/premium', '/login', '/register', '/forgot-password', '/reset-password', '/auth/callback', '/payment/return', '/payment/cancel', '/newsletter/confirm', '/newsletter/unsubscribe', '/contact', '/services'];
+const SHELL_PATHS = ['/admin', '/admin/' + '*', '/ai', '/premium', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/auth/callback', '/payment/return', '/payment/cancel', '/newsletter/confirm', '/newsletter/unsubscribe', '/contact', '/services'];
 const SHELL_CACHE = 'public, max-age=0, s-maxage=300, stale-while-revalidate=3600';
 
 const h = fn => (req,res,next) => Promise.resolve(fn(req,res)).catch(next);

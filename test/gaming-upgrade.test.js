@@ -139,3 +139,8 @@ test('Google Tag Manager runs on public indexable pages only, with a policy that
  const init=(await import('node:fs')).readFileSync(path.join(root,'gtm-init.js'),'utf8');
  assert.match(init,/window\.dataLayer\s*=\s*window\.dataLayer\s*\|\|\s*\[\]/);assert.match(init,/'gtm\.start'/);assert.match(init,/event:\s*'gtm\.js'/);
 });
+test('the verification page is a private app page: reachable, not indexed, not in robots allow, no tag manager',async()=>{
+ const res=await request(site()).get('/verify-email?email=a%40b.co');
+ assert.equal(res.status,200);assert.match(res.text,/noindex/);assert.doesNotMatch(res.text,/googletagmanager|gtm-init/);
+ assert.match((await request(site()).get('/robots.txt')).text,/Disallow: \/verify-email/);
+});
